@@ -7,7 +7,7 @@ function App() {
         <div className="app">
             <Sidebar />
 
-            <main className="app__main">
+            <main className="app__main shadow-3 ">
                 <header className="page-header">
                     <h1 className="page-header__title">Welcome back, Dimitri!</h1>
                     <p className="page-header__subtitle">Select a movement to start.</p>

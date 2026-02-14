@@ -9,9 +9,6 @@
     flex-direction: column;
     height: 100%;
     background-color: var(--colour-slate-50);
-    border-right: 1px solid var(--colour-slate-200);
-
-    padding: var(--space-4) var(--space-4);
     width: var(--sidebar-width);
 
     transition: width var(--transition-normal);
