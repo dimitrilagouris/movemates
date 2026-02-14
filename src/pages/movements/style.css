@@ -1,0 +1,32 @@
+.movements-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    line-height: 1.2;
+}
+
+.movements-hero {
+    display: flex;
+    flex-direction: column;
+}
+
+.movements-hero__title {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--colour-zinc-900);
+    letter-spacing: -0.02em;
+}
+
+.movements-hero__subtitle {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--colour-zinc-400);
+    letter-spacing: -0.02em;
+}
+
+.movements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+    align-items: start;
+}

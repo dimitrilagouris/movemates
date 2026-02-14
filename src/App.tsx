@@ -1,5 +1,6 @@
-import { Sidebar } from './components/sidebar/index.tsx'
-import './styles/base.css'
+import { Sidebar } from './components/sidebar/index.tsx';
+import { MovementsPage } from './pages/movements/index.tsx';
+import './styles/base.css';
 import './App.css';
 
 function App() {
@@ -7,16 +8,9 @@ function App() {
         <div className="app">
             <Sidebar />
 
-            <main className="app__main shadow-3 ">
-                <header className="page-header">
-                    <h1 className="page-header__title">Welcome back, Dimitri!</h1>
-                    <p className="page-header__subtitle">Select a movement to start.</p>
-                </header>
+            <main className="app__main shadow-3">
 
-                {/* Placeholder for your Movements content */}
-                <div style={{}}>
-                    Movements Content Will Go Here
-                </div>
+                <MovementsPage />
             </main>
         </div>
     );
