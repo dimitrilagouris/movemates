@@ -91,7 +91,7 @@
 .sidebar__footer-nav {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
     margin-top: auto;
     border-top: 1px solid var(--colour-slate-200);
     padding-top: var(--space-4);
@@ -188,6 +188,8 @@
     display: none;
 }
 
-svg {
-    display: block;
+.user-profile__name {
+    font-weight: 500;
+    color: var(--colour-slate-900);
+    font-size: var(--text-sm);
 }

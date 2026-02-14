@@ -14,7 +14,7 @@ import { UserProfile } from './UserProfile';
 
 export const Sidebar = () => {
     const [collapsed, setCollapsed] = useState(false);
-    const [activePage, setActivePage] = useState('Dashboard');
+    const [activePage, setActivePage] = useState('Movement');
 
     const toggleCollapse = () => setCollapsed((prev) => !prev);
     const handleNav = (page: string) => setActivePage(page);
