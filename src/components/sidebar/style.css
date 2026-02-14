@@ -55,7 +55,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--colour-slate-900);
+    color: var(--colour-slate-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,10 +65,11 @@
     height: var(--sidebar-icon-size);
     padding: 0;
     margin-left: auto;
+    transition: var(--transition-normal);
 }
 
 .sidebar__toggle:hover {
-    background-color: var(--colour-slate-200);
+    background-color: var(--colour-slate-100);
 }
 
 .sidebar--collapsed .sidebar__logo-container {
