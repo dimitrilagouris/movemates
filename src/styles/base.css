@@ -36,8 +36,8 @@
     --z-modal: 50;
     --z-tooltip: 100;
 
-    --transition-fast: 150ms ease;
-    --transition-normal: 300ms ease;
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 300ms ease-in-out;
 
     --colour-red-50: oklch(0.971 0.013 17.38);
     --colour-red-100: oklch(0.936 0.032 17.717);
@@ -302,6 +302,9 @@
     --colour-stone-800: oklch(0.268 0.007 34.298);
     --colour-stone-900: oklch(0.216 0.006 56.043);
     --colour-stone-950: oklch(0.147 0.004 49.25);
+
+    --colour-black: oklch(0 0 0);
+    --colour-white: oklch(1 0 89.876);
 
     --tw-shadow-color: initial;
     --tw-inset-shadow-color: initial;
