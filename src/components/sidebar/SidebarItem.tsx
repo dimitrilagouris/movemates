@@ -10,7 +10,7 @@ interface SidebarItemProps {
 export const SidebarItem = ({ label, icon, isActive, onClick }: SidebarItemProps) => {
     return (
         <div
-            className={`sidebar-item ${isActive ? 'sidebar-item--active' : ''}`}
+            className={`sidebar-item ${isActive ? 'sidebar-item--active shadow-1' : ''}`}
             onClick={onClick}
         >
             <div className="sidebar-item__icon">

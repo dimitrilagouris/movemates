@@ -39,12 +39,12 @@
     font-weight: 500;
     cursor: pointer;
     font-family: inherit;
-    font-size: 14px;
-    transition: color 0.3s ease;
+    font-size: var(--text-sm);
+    transition: var(--transition-fast);
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 12px;
+    padding: var(--space-0) var(--space-3);
     position: relative;
     z-index: 1;
 }
@@ -65,13 +65,13 @@
     border-radius: var(--radius-md);
     font-family: var(--font-sans);
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--text-sm);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 0 20px;
+    gap: var(--space-2);
+    padding: var(--space-0) var(--space-4);
     transition: var(--transition-fast);
     box-sizing: border-box;
     text-decoration: none;
@@ -109,13 +109,13 @@
 
 .btn-square {
     width: var(--btn-height);
-    padding: 0;
+    padding: var(--space-0);
     aspect-ratio: 1/1;
 }
 
 .btn-small {
     height: 30px;
-    font-size: 12px;
+    font-size: var(--text-xs);
     border-radius: var(--radius-sm);
 }
 
@@ -124,7 +124,7 @@
     min-width: 120px;
     width: auto;
     justify-content: space-between;
-    padding: 0 8px;
+    padding: var(--space-0) var(--space-4);
 }
 
 .btn-hug {
@@ -132,5 +132,5 @@
 }
 
 .btn-no-padding {
-    padding: 0 5px;
+    padding: var(--space-0) var(--space-1);
 }
