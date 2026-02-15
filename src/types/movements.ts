@@ -15,4 +15,8 @@ export interface Movement {
     subtitle: string;
     description: string;
     imageUrl: string;
+
+    instructions: string[];
+    doGuidelines: string[];
+    dontGuidelines: string[];
 }
