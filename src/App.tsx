@@ -3,6 +3,7 @@ import { Sidebar } from './components/sidebar';
 import { MovementsPage } from './pages/movements';
 import { LearnPage } from './pages/movements/learn';
 import './styles/base.css';
+import './styles/buttons.css';
 import './App.css';
 
 function App() {
