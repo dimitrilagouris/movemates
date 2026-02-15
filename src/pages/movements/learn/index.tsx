@@ -2,16 +2,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { RiArrowLeftLine } from "react-icons/ri";
 import { MOVEMENTS } from '../../../config/movements';
 import type {MovementId} from '../../../types/movements';
-
-
 import '../../../styles/base.css';
 
 export const LearnPage = () => {
 
-    const { movementId } = useParams<{ movementId: MovementId }>();
+
     const navigate = useNavigate();
 
     // Look up movement data
+    const { movementId } = useParams<{ movementId: MovementId }>();
     const movement = movementId ? MOVEMENTS[movementId] : null;
 
     if (!movement) {

@@ -18,7 +18,7 @@ export const MOVEMENTS: Record<string, Movement> = {
     'walking-exercise': {
         id: 'walking-exercise',
         title: 'Walking Exercise',
-        subtitle: 'Analyze your gait.',
+        subtitle: 'Analyse your gait.',
         description: "Let's see how you walk! Walk across the room in a straight line.",
         imageUrl: ''
     }
