@@ -83,7 +83,10 @@ export const LearnPage = () => {
                 </div>
 
                 <div className="learn-page__header-right">
-                    <button className="btn btn-primary shadow-1">
+                    <button
+                        className="btn btn-primary shadow-1"
+                        onClick={() => navigate(`/movements/record/${movementId}`)}
+                    >
                         Start Session
                     </button>
                 </div>
@@ -112,7 +115,7 @@ export const LearnPage = () => {
                 </div>
 
                 {/* Right: Sidebar */}
-                <aside className="learn-sidebar shadow-1">
+                <aside className="learn-sidebar">
                     {/* CARD 1: Instructions */}
                     <div className="sidebar-card shadow-1">
                         <div className="sidebar-card__header">
