@@ -147,6 +147,14 @@ export const RecordPage = () => {
                 <div className="learn-page__header-left">
                     <h1 className="learn-title">{movement.title}</h1>
                 </div>
+                <div className="learn-page__header-right">
+                    <button
+                        className="btn btn-primary shadow-1"
+                        onClick={() => navigate(`/movements/replay/${movementId}`)}
+                    >
+                        View Replay
+                    </button>
+                </div>
             </header>
 
             <main className="learn-page__content">
