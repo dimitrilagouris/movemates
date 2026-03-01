@@ -1,6 +1,6 @@
-import type { MovementAnalyser } from './MovementAnalyser';
-import type { LandmarksData } from './landmarks';
-import type { CalibrationTracker, BaseMovementTracker } from './movements';
+import type { MovementAnalyser } from '../../types/MovementAnalyser.ts';
+import type { LandmarksData } from '../../types/landmarks.ts';
+import type { CalibrationTracker, BaseMovementTracker } from '../../types/movements.ts';
 
 /** Metrics specifically tracked during the One-Legged Stand exercise. */
 export interface OneLeggedStandTracker extends BaseMovementTracker {
