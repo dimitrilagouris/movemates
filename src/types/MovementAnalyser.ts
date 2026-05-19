@@ -41,4 +41,12 @@ export interface MovementAnalyser<TTracker extends BaseMovementTracker> {
 
     /** Injects the overall exercise progress UI into the provided DOM element. */
     populateMovementProgress(attempt: number, progressElement: HTMLElement): void;
+
+    getCalibrationUIState(): CalibrationUIState;
+}
+
+export interface CalibrationUIState {
+    progress: number; // 0 to 100
+    message: string;
+    isComplete: boolean;
 }

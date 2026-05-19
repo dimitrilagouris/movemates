@@ -1,21 +1,90 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect, useRef, type RefObject } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     RiArrowLeftLine,
-    RiCameraLensLine,
     RiPlayCircleLine,
     RiStopCircleLine,
     RiRestartLine
 } from "react-icons/ri";
 import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
+import { VideoPlayer } from '../../../components/VideoPlayer';
+import { MediaPipeDetector } from '../../../engine/mediapipe/detector';
+import { getAnalyserInstance } from '../../../engine/factories/MovementAnalyserFactoryRegistry';
+import { type MovementAnalyser } from '../../../types/MovementAnalyser';
 import './style.css';
+
+/**
+ * Connects the live webcam feed to the correct movement analyser.
+ * Handles background AR tracking and UI state updates.
+ */
+const useCalibration = (movementId: MovementId | undefined, videoRef: RefObject<HTMLVideoElement>) => {
+    const [progress, setProgress] = useState<number>(0);
+    const [message, setMessage] = useState<string>("Loading AR tracking engine...");
+
+    const detectorRef = useRef(new MediaPipeDetector());
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!movementId || !video) return;
+
+        let animationFrameId: number;
+        const detector = detectorRef.current;
+
+        // Dynamically load the correct math engine for this movement
+        let analyser: MovementAnalyser<any>;
+        try {
+            analyser = getAnalyserInstance(movementId);
+        } catch (error) {
+            setMessage("Calibration not supported for this movement.");
+            return;
+        }
+
+        const startEngine = async (): Promise<void> => {
+            await detector.initialise();
+
+            const processFrame = (): void => {
+                // Ensure video is playing and MediaPipe is ready
+                if (video.readyState >= 2 && detector.isReady()) {
+
+                    const timestamp = performance.now();
+                    const landmarksData = detector.detect(video, timestamp);
+
+                    if (landmarksData) {
+                        // 1. Run the pure math logic
+                        analyser.calibrate(landmarksData);
+
+                        // 2. Fetch the standardised UI state
+                        const uiState = analyser.getCalibrationUIState();
+
+                        setProgress(uiState.progress);
+                        setMessage(uiState.message);
+                    }
+                }
+
+                // Loop continuously on monitor refresh
+                animationFrameId = requestAnimationFrame(processFrame);
+            };
+
+            processFrame();
+        };
+
+        startEngine();
+
+        // Teardown AR engine when user leaves the page
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+            detector.close();
+        };
+    }, [movementId, videoRef]);
+
+    return { progress, message };
+};
 
 /**
  * Renders the video feed placeholder and recording controls.
  */
-const RecordingInterface = ({ onStop }: { onStop: () => void }) => {
-    // AR engine state would typically be managed here or passed as props
+const RecordingInterface = ({ onStop, videoRef }: { onStop: () => void, videoRef: RefObject<HTMLVideoElement> }): JSX.Element => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
 
     const handleStart = (): void => setIsRecording(true);
@@ -29,14 +98,8 @@ const RecordingInterface = ({ onStop }: { onStop: () => void }) => {
     return (
         <div className="record-video-section">
             <div className="video-container">
-                <div className="video-content">
-                    <div className="video-icon-circle video-icon-circle--faint">
-                        <RiCameraLensLine size={32} />
-                    </div>
-                    <p>
-                        <strong>{isRecording ? "Recording..." : "Camera Ready"}</strong>
-                    </p>
-                </div>
+                <VideoPlayer videoRef={videoRef} />
+                {isRecording && <div className="recording-indicator shadow-1" />}
             </div>
 
             <div className="video-controls">
@@ -68,15 +131,13 @@ const RecordingInterface = ({ onStop }: { onStop: () => void }) => {
 /**
  * Renders the AR calibration status and progress bar.
  */
-const CalibrationCard = ({ progress }: { progress: number }) => (
+const CalibrationCard = ({ progress, message }: { progress: number, message: string }): JSX.Element => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
             <span className="sidebar-card__title">Calibration</span>
         </div>
         <div className="calibration-content">
-            <p className="calibration-note">
-                Please ensure your entire body is visible to the camera for accurate tracking.
-            </p>
+            <p className="calibration-note">{message}</p>
             <div className="progress-bar-container">
                 <div
                     className="progress-bar-fill"
@@ -93,7 +154,7 @@ const CalibrationCard = ({ progress }: { progress: number }) => (
 /**
  * Renders the step-by-step instructions for the movement.
  */
-const InstructionsCard = ({ instructions }: { instructions: string[] }) => (
+const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Element => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
             <span className="sidebar-card__title">Instructions</span>
@@ -113,21 +174,15 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }) => (
 );
 
 /**
- * Main Record Page component managing the layout and navigation.
+ * Main Record Page component managing the layout and AR orchestration.
  */
-export const RecordPage = () => {
+export const RecordPage = (): JSX.Element => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
+    const videoRef = useRef<HTMLVideoElement>(null);
 
-    // Mock calibration progress for UI demonstration.
-    // This should be replaced with actual AR skeletal tracking confidence.
-    const [calibrationProgress, setCalibrationProgress] = useState<number>(0);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setCalibrationProgress(100), 2000);
-        return () => clearTimeout(timer);
-    }, []);
-
+    // Abstracted calibration loop handles AR and returns clean state
+    const { progress, message } = useCalibration(movementId, videoRef);
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
 
     if (!movement) return <div>Movement not found</div>;
@@ -159,11 +214,12 @@ export const RecordPage = () => {
 
             <main className="learn-page__content">
                 <RecordingInterface
-                    onStop={() => navigate(`/movements/replay/${movementId}/`)}
+                    videoRef={videoRef}
+                    onStop={() => navigate(`/movements/replay/${movementId}`)}
                 />
 
                 <aside className="learn-sidebar shadow-1">
-                    <CalibrationCard progress={calibrationProgress} />
+                    <CalibrationCard progress={progress} message={message} />
                     <InstructionsCard instructions={movement.instructions} />
                 </aside>
             </main>
