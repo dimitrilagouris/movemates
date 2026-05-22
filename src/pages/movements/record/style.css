@@ -62,7 +62,6 @@
     height: 100%;
     object-fit: cover;
     pointer-events: none; /* Prevents clicks intercepting parent controllers */
-    transform: scaleX(-1); /* Syncs mirroring geometry to match video presentation layout */
 }
 
 /* Red pulsing dot when recording */

@@ -13,7 +13,80 @@ import { MediaPipeDetector } from '../../../engine/mediapipe/detector';
 import { getAnalyserInstance } from '../../../engine/factories/MovementAnalyserFactoryRegistry';
 import { type MovementAnalyser } from '../../../types/MovementAnalyser';
 import { drawSkeletonConnections, drawJointPoints } from '../../../engine/mediapipe/drawing';
+import { DatabaseEngine } from '../../../engine/db';
 import './style.css';
+
+/**
+ * Manages the native MediaRecorder API to capture, encode, and store video.
+ */
+const useVideoRecorder = (
+    videoRef: RefObject<HTMLVideoElement>,
+    setIsRecording: (isRec: boolean) => void,
+    onSaved: () => void
+) => {
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const chunksRef = useRef<BlobPart[]>([]);
+
+    const start = (): void => {
+        const stream = videoRef.current?.srcObject as MediaStream | undefined;
+        if (!stream) return;
+
+        chunksRef.current = [];
+
+        // Attempt to capture high quality webm
+        const options = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+            ? { mimeType: 'video/webm;codecs=vp9' }
+            : { mimeType: 'video/webm' };
+
+        const recorder = new MediaRecorder(stream, options);
+        mediaRecorderRef.current = recorder;
+
+        recorder.ondataavailable = (event: BlobEvent) => {
+            if (event.data.size > 0) chunksRef.current.push(event.data);
+        };
+
+        recorder.onstop = async () => {
+            if (chunksRef.current.length > 0) {
+                const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+                const db = new DatabaseEngine();
+                // Overwrites the previous recording naturally by reusing 'lastRecording'
+                await db.saveRecordingBlob(blob, 'lastRecording');
+                onSaved();
+            }
+        };
+
+        recorder.start();
+        setIsRecording(true);
+    };
+
+    const stop = (): void => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+            mediaRecorderRef.current.stop(); // Triggers onstop, saving the DB file and navigating
+            setIsRecording(false);
+        }
+    };
+
+    const restart = (): void => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+            mediaRecorderRef.current.onstop = null; // Disconnect listener so it doesn't save to DB
+            mediaRecorderRef.current.stop();
+        }
+        chunksRef.current = [];
+        setIsRecording(false);
+    };
+
+    // Cleanup hanging recordings if user navigates away unexpectedly
+    useEffect(() => {
+        return () => {
+            if (mediaRecorderRef.current?.state === 'recording') {
+                mediaRecorderRef.current.onstop = null;
+                mediaRecorderRef.current.stop();
+            }
+        };
+    }, []);
+
+    return { start, stop, restart };
+};
 
 /**
  * Orchestrates the AR session, delegating logic to the movement's state machine.
@@ -30,18 +103,13 @@ const useMovementSession = (
     const detectorRef = useRef(new MediaPipeDetector());
     const analyserRef = useRef<MovementAnalyser<any> | null>(null);
 
-    // Initialise the correct analyser for the movement
     useEffect(() => {
         if (movementId) {
-            try {
-                analyserRef.current = getAnalyserInstance(movementId);
-            } catch {
-                setMessage("Calibration not supported for this movement.");
-            }
+            try { analyserRef.current = getAnalyserInstance(movementId); }
+            catch { setMessage("Calibration not supported for this movement."); }
         }
     }, [movementId]);
 
-    // Notify the analyser's state machine when recording starts/stops
     useEffect(() => {
         if (analyserRef.current) {
             analyserRef.current.setRecordingState(isRecording);
@@ -60,34 +128,38 @@ const useMovementSession = (
         const startEngine = async (): Promise<void> => {
             await detector.initialise();
 
+            let lastVideoTime = -1;
+
             const processFrame = (): void => {
                 const analyser = analyserRef.current;
 
                 if (video.readyState >= 2 && detector.isReady() && ctx && analyser) {
-                    if (canvas.width !== video.videoWidth) {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                    }
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    const timestamp = performance.now();
-                    const landmarksData = detector.detect(video, timestamp);
+                    if (video.currentTime !== lastVideoTime) {
+                        lastVideoTime = video.currentTime;
 
-                    if (landmarksData && landmarksData.landmarks[0]) {
-                        // 1. Delegate math to the Analyser's active state
-                        analyser.processFrame(landmarksData, timestamp);
+                        if (canvas.width !== video.videoWidth) {
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                        }
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        // 2. Fetch UI state
-                        const uiState = analyser.getCalibrationUIState();
-                        setProgress(uiState.progress);
-                        setMessage(uiState.message);
+                        const timestamp = performance.now();
+                        const landmarksData = detector.detect(video, timestamp);
 
-                        // 3. Delegate colour selection to the active state
-                        const activeColour = analyser.getOverlayColour();
-                        const activeFrameLandmarks = landmarksData.landmarks[0];
+                        if (landmarksData && landmarksData.landmarks[0]) {
+                            analyser.processFrame(landmarksData, timestamp);
 
-                        drawSkeletonConnections(ctx, activeFrameLandmarks, activeColour);
-                        drawJointPoints(ctx, activeFrameLandmarks, activeColour);
+                            const uiState = analyser.getCalibrationUIState();
+                            setProgress(uiState.progress);
+                            setMessage(uiState.message);
+
+                            const activeColour = analyser.getOverlayColour();
+                            const activeFrameLandmarks = landmarksData.landmarks[0];
+
+                            drawSkeletonConnections(ctx, activeFrameLandmarks, activeColour);
+                            drawJointPoints(ctx, activeFrameLandmarks, activeColour);
+                        }
                     }
                 }
                 animationFrameId = requestAnimationFrame(processFrame);
@@ -159,9 +231,6 @@ const RecordingInterface = ({
     );
 };
 
-/**
- * Renders the AR calibration status and progress bar.
- */
 const CalibrationCard = ({ progress, message }: { progress: number, message: string }): JSX.Element => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
@@ -170,10 +239,7 @@ const CalibrationCard = ({ progress, message }: { progress: number, message: str
         <div className="calibration-content">
             <p className="calibration-note">{message}</p>
             <div className="progress-bar-container">
-                <div
-                    className="progress-bar-fill"
-                    style={{ width: `${progress}%` }}
-                />
+                <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
             </div>
             <span className="calibration-status">
                 {progress === 100 ? "Fully Calibrated" : "Calibrating..."}
@@ -182,9 +248,6 @@ const CalibrationCard = ({ progress, message }: { progress: number, message: str
     </div>
 );
 
-/**
- * Renders the step-by-step instructions for the movement.
- */
 const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Element => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
@@ -204,9 +267,6 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Ele
     </div>
 );
 
-/**
- * Main Record Page component managing the layout and AR orchestration.
- */
 export const RecordPage = (): JSX.Element => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
@@ -214,18 +274,16 @@ export const RecordPage = (): JSX.Element => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // LIFTED STATE: The page now orchestrates the recording mode
     const [isRecording, setIsRecording] = useState<boolean>(false);
 
+    // Initialise recorder and wire the stop event to trigger navigation
+    const handleSavedAndNavigate = () => navigate(`/movements/replay/${movementId}`);
+    const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
+
     const { progress, message } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
-
     if (!movement) return <div>Movement not found</div>;
-
-    const handleStop = () => {
-        setIsRecording(false);
-        navigate(`/movements/replay/${movementId}`);
-    };
 
     return (
         <div className="learn-page">
@@ -255,9 +313,9 @@ export const RecordPage = (): JSX.Element => {
             <main className="learn-page__content">
                 <RecordingInterface
                     isRecording={isRecording}
-                    onStart={() => setIsRecording(true)}
-                    onRestart={() => setIsRecording(false)}
-                    onStop={handleStop}
+                    onStart={start}
+                    onRestart={restart}
+                    onStop={stop}
                     videoRef={videoRef}
                     canvasRef={canvasRef}
                 />

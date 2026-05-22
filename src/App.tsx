@@ -7,6 +7,7 @@ import {RecordPage} from "./pages/movements/record";
 import './styles/base.css';
 import './styles/buttons.css';
 import './App.css';
+import {ReplayPage} from "./pages/movements/replay";
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/movements" element={<MovementsPage />} />
                     <Route path="/movements/learn/:movementId" element={<LearnPage />} />
                     <Route path="/movements/record/:movementId" element={<RecordPage />} />
+                    <Route path="/movements/replay/:movementId" element={<ReplayPage />} />
                 </Routes>
             </main>
         </div>
