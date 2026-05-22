@@ -1,4 +1,4 @@
-import type {CalibrationUIState, MovementAnalyser} from '../../types/MovementAnalyser';
+import type { CalibrationUIState, MovementAnalyser } from '../../types/MovementAnalyser';
 import type { LandmarksData, Landmark } from '../../types/landmarks';
 import type { CalibrationTracker, BaseMovementTracker } from '../../types/movements';
 
@@ -9,6 +9,7 @@ const LANDMARKS = {
     left_elbow: 13, right_elbow: 14,
     left_wrist: 15, right_wrist: 16,
     left_hip: 23, right_hip: 24,
+    left_foot_index: 31, right_foot_index: 32, // Added feet for stance checking
     left_index: 19, right_index: 20
 } as const;
 
@@ -75,6 +76,37 @@ function checkStance(data: LandmarksData, frame: number, threshold: number = 0.0
     return { isCorrect, armspan: rightArmLen + leftArmLen + shoulderSpan };
 }
 
+// --- State Pattern Implementations ---
+
+interface SessionState {
+    processFrame(data: LandmarksData, timestamp: number): void;
+    getColour(): string;
+}
+
+class CalibratingState implements SessionState {
+    constructor(private context: OneLeggedStandAnalyser) {}
+
+    public processFrame(data: LandmarksData): void {
+        this.context.runCalibrationLogic(data);
+    }
+
+    public getColour(): string {
+        return this.context.calibrationFinished() ? "#22c55e" : "#ef4444";
+    }
+}
+
+class RecordingState implements SessionState {
+    constructor(private context: OneLeggedStandAnalyser) {}
+
+    public processFrame(data: LandmarksData): void {
+        this.context.runAnalysisLogic(data);
+    }
+
+    public getColour(): string {
+        return this.context.isPoseValid() ? "#22c55e" : "#ef4444";
+    }
+}
+
 // --- Domain Class ---
 
 export interface OneLeggedStandTracker extends BaseMovementTracker {
@@ -82,33 +114,44 @@ export interface OneLeggedStandTracker extends BaseMovementTracker {
     lifted_leg: 'left' | 'right' | null;
     supporting_leg: 'left' | 'right' | null;
     legs_crossed: boolean;
-    is_standing_history: boolean[];
-    history_threshold: number;
 }
 
 export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTracker> {
-    private currentTime: number | null = null;
-    private tracker: OneLeggedStandTracker | null = null;
-    private calibration: CalibrationTracker | null = null;
+    private activeState: SessionState;
+    private tracker: OneLeggedStandTracker;
+    public calibration: CalibrationTracker | null = null;
     private exerciseAttempts: number = 1;
 
-    /** Resets the analyser to its initial state. */
-    public reset(): void {
-        this.currentTime = null;
-        this.tracker = null;
-        this.calibration = null;
+    constructor() {
+        this.activeState = new CalibratingState(this);
+        this.tracker = {
+            is_standing: false,
+            lifted_leg: null,
+            supporting_leg: null,
+            legs_crossed: false
+        };
     }
 
-    /** Updates the current processing time. */
-    public setTime(currentTime: number): void {
-        this.currentTime = currentTime;
+    /** Toggles the internal state machine between calibration and recording */
+    public setRecordingState(isRecording: boolean): void {
+        this.activeState = isRecording ? new RecordingState(this) : new CalibratingState(this);
     }
 
-    public configure(settings?: unknown): void {}
+    /** Delegates mathematical processing to the active state */
+    public processFrame(landmarksData: LandmarksData, timestamp: number): void {
+        this.activeState.processFrame(landmarksData, timestamp);
+    }
 
-    /** Processes a frame to update calibration state and establish baselines. */
-    public calibrate(landmarksData: LandmarksData, frameThreshold: number = 20): CalibrationTracker {
-        this.initialiseCalibrationTracker();
+    /** Dynamically requests the skeleton colour based on the current mode and math validation */
+    public getOverlayColour(): string {
+        return this.activeState.getColour();
+    }
+
+    /**
+     * Core calibration logic (invoked by CalibratingState)
+     */
+    public runCalibrationLogic(landmarksData: LandmarksData, frameThreshold: number = 20): void {
+        if (!this.calibration) this.initialiseCalibrationTracker();
 
         const isVisible = checkAllVisible(landmarksData, 0);
         updateHistory(this.calibration!.visibility, isVisible, frameThreshold);
@@ -118,21 +161,33 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         updateHistory(this.calibration!.armspan, stance.armspan, frameThreshold);
 
         this.processCalibrationState(frameThreshold);
+    }
 
-        return this.calibration!;
+    /**
+     * Core movement logic (invoked by RecordingState)
+     */
+    public runAnalysisLogic(data: LandmarksData): void {
+        const leftFootY = getCoord(data, 0, LANDMARKS.left_foot_index, 'y');
+        const rightFootY = getCoord(data, 0, LANDMARKS.right_foot_index, 'y');
+
+        // Use hip width as a dynamic threshold to account for camera distance
+        const leftHipX = getCoord(data, 0, LANDMARKS.left_hip, 'x');
+        const rightHipX = getCoord(data, 0, LANDMARKS.right_hip, 'x');
+        const hipSpan = Math.abs(leftHipX - rightHipX);
+
+        // Pose is valid if the vertical gap between feet is greater than the hip width
+        this.tracker.is_standing = Math.abs(leftFootY - rightFootY) > hipSpan;
     }
 
     private initialiseCalibrationTracker(): void {
-        if (!this.calibration) {
-            this.calibration = {
-                curr_state: 0,
-                total_states: 2,
-                visibility: [],
-                standing_straight: [],
-                armspan: [],
-                avg_armspan: 0,
-            };
-        }
+        this.calibration = {
+            curr_state: 0,
+            total_states: 2,
+            visibility: [],
+            standing_straight: [],
+            armspan: [],
+            avg_armspan: 0,
+        };
     }
 
     private processCalibrationState(threshold: number): void {
@@ -169,50 +224,21 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         return sum / this.calibration.armspan.length;
     }
 
-    /** Returns true if the user has passed the initial visibility check. */
-    public isCalibrationValid(): boolean {
-        return (this.calibration?.curr_state ?? 0) > 0;
+    public isPoseValid(): boolean {
+        return this.tracker.is_standing;
     }
 
-    /** Returns true if all baseline metrics have been successfully gathered. */
     public calibrationFinished(): boolean {
         return this.calibration?.curr_state === 2;
     }
 
-    public analyse(landmarksData: LandmarksData, frameIndex = 0): OneLeggedStandTracker {
-        throw new Error("Method not implemented.");
+    public movementFinished(attempts: OneLeggedStandTracker[]): boolean {
+        return false; // Stub for when you implement full attempt tracking
     }
-
-    public isPoseValid(): boolean { return false; }
-
-    public movementFinished(attempts: OneLeggedStandTracker[]): boolean { return false; }
-
-    /** Updates the DOM with the current calibration step directive. */
-    public populateCalibrationProgress(progressElement: HTMLElement): void {
-        if (!this.calibration) return;
-
-        const state = this.calibration.curr_state;
-        let directive = "Follow the on-screen instructions";
-
-        if (state === 0) directive = "Ensure all body parts are visible to the camera.";
-        if (state === 1) directive = "Stand up straight and hold both hands by your side.";
-        if (state === 2) directive = "Calibration complete, please proceed with the movement exercise.";
-
-        const progressBar = progressElement.querySelector('#calibration-progress') as HTMLProgressElement;
-        const directiveText = progressElement.querySelector('#calibration-directive');
-
-        if (progressBar) progressBar.value = state;
-        if (directiveText) directiveText.textContent = directive;
-    }
-
-    public populateMetrics(metricsElement: HTMLElement): void {}
-
-    public populateMovementProgress(attempt: number, progressElement: HTMLElement): void {}
-
 
     public getCalibrationUIState(): CalibrationUIState {
         if (!this.calibration) {
-            return { progress: 0, message: "Initializing...", isComplete: false };
+            return { progress: 0, message: "Initialising...", isComplete: false };
         }
 
         const state = this.calibration.curr_state;
@@ -227,7 +253,4 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
 
         return { progress: 100, message: "Calibration complete, please proceed with the exercise.", isComplete: true };
     }
-
-
 }
-

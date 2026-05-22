@@ -1,6 +1,13 @@
 import type {LandmarksData} from './landmarks';
 import type { CalibrationTracker, BaseMovementTracker } from './movements';
 
+
+export interface CalibrationUIState {
+    progress: number;
+    message: string;
+    isComplete: boolean;
+}
+
 /**
  * The core contract that all physiotherapy movement logic classes must implement.
  * @template TTracker The specific type of tracker used by this movement.
@@ -43,6 +50,16 @@ export interface MovementAnalyser<TTracker extends BaseMovementTracker> {
     populateMovementProgress(attempt: number, progressElement: HTMLElement): void;
 
     getCalibrationUIState(): CalibrationUIState;
+
+    /** Tells the analyser whether the user has clicked Start/Stop */
+    setRecordingState(isRecording: boolean): void;
+
+    /** Feeds the latest frame to the active internal state */
+    processFrame(landmarksData: LandmarksData, timestamp: number): void;
+
+    /** Dynamically requests the skeleton colour based on the current state */
+    getOverlayColour(): string;
+
 }
 
 export interface CalibrationUIState {

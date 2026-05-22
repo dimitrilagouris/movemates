@@ -16,18 +16,37 @@ import { drawSkeletonConnections, drawJointPoints } from '../../../engine/mediap
 import './style.css';
 
 /**
- * Connects the live webcam feed to the correct movement analyser.
- * Handles background AR tracking, skeletal drawing, and UI state updates.
+ * Orchestrates the AR session, delegating logic to the movement's state machine.
  */
-const useCalibration = (
+const useMovementSession = (
     movementId: MovementId | undefined,
     videoRef: RefObject<HTMLVideoElement>,
-    canvasRef: RefObject<HTMLCanvasElement>
+    canvasRef: RefObject<HTMLCanvasElement>,
+    isRecording: boolean
 ) => {
     const [progress, setProgress] = useState<number>(0);
     const [message, setMessage] = useState<string>("Loading AR tracking engine...");
 
     const detectorRef = useRef(new MediaPipeDetector());
+    const analyserRef = useRef<MovementAnalyser<any> | null>(null);
+
+    // Initialise the correct analyser for the movement
+    useEffect(() => {
+        if (movementId) {
+            try {
+                analyserRef.current = getAnalyserInstance(movementId);
+            } catch {
+                setMessage("Calibration not supported for this movement.");
+            }
+        }
+    }, [movementId]);
+
+    // Notify the analyser's state machine when recording starts/stops
+    useEffect(() => {
+        if (analyserRef.current) {
+            analyserRef.current.setRecordingState(isRecording);
+        }
+    }, [isRecording]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -38,53 +57,39 @@ const useCalibration = (
         const detector = detectorRef.current;
         const ctx = canvas.getContext('2d');
 
-        // Dynamically load the correct math engine for this movement
-        let analyser: MovementAnalyser<any>;
-        try {
-            analyser = getAnalyserInstance(movementId);
-        } catch (error) {
-            setMessage("Calibration not supported for this movement.");
-            return;
-        }
-
         const startEngine = async (): Promise<void> => {
             await detector.initialise();
 
             const processFrame = (): void => {
-                // Ensure video is playing, MediaPipe is ready, and canvas is accessible
-                if (video.readyState >= 2 && detector.isReady() && ctx) {
+                const analyser = analyserRef.current;
 
-                    // Match canvas dimensions to video to prevent skeletal offset
+                if (video.readyState >= 2 && detector.isReady() && ctx && analyser) {
                     if (canvas.width !== video.videoWidth) {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
                     }
-
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                     const timestamp = performance.now();
                     const landmarksData = detector.detect(video, timestamp);
 
                     if (landmarksData && landmarksData.landmarks[0]) {
-                        // 1. Run the pure math logic
-                        analyser.calibrate(landmarksData);
+                        // 1. Delegate math to the Analyser's active state
+                        analyser.processFrame(landmarksData, timestamp);
 
-                        // 2. Fetch the standardised UI state
+                        // 2. Fetch UI state
                         const uiState = analyser.getCalibrationUIState();
-
                         setProgress(uiState.progress);
                         setMessage(uiState.message);
 
-                        // 3. Render the skeleton overlay (Green if ready, Red if calibrating)
-                        const activeColour = uiState.progress === 100 ? "#22c55e" : "#ef4444";
+                        // 3. Delegate colour selection to the active state
+                        const activeColour = analyser.getOverlayColour();
                         const activeFrameLandmarks = landmarksData.landmarks[0];
 
                         drawSkeletonConnections(ctx, activeFrameLandmarks, activeColour);
                         drawJointPoints(ctx, activeFrameLandmarks, activeColour);
                     }
                 }
-
-                // Loop continuously on monitor refresh
                 animationFrameId = requestAnimationFrame(processFrame);
             };
 
@@ -93,7 +98,6 @@ const useCalibration = (
 
         startEngine();
 
-        // Teardown AR engine when user leaves the page
         return () => {
             cancelAnimationFrame(animationFrameId);
             detector.close();
@@ -104,23 +108,23 @@ const useCalibration = (
 };
 
 /**
- * Renders the video feed, skeletal overlay, and recording controls.
+ * Pure UI component for rendering the video and controls.
  */
-const RecordingInterface = ({onStop, videoRef, canvasRef}: {
+const RecordingInterface = ({
+                                isRecording,
+                                onStart,
+                                onRestart,
+                                onStop,
+                                videoRef,
+                                canvasRef
+                            }: {
+    isRecording: boolean,
+    onStart: () => void,
+    onRestart: () => void,
     onStop: () => void,
     videoRef: RefObject<HTMLVideoElement>,
     canvasRef: RefObject<HTMLCanvasElement>
 }): JSX.Element => {
-    const [isRecording, setIsRecording] = useState<boolean>(false);
-
-    const handleStart = (): void => setIsRecording(true);
-    const handleRestart = (): void => setIsRecording(false);
-
-    const handleStop = (): void => {
-        setIsRecording(false);
-        onStop();
-    };
-
     return (
         <div className="record-video-section">
             <div className="video-container">
@@ -132,20 +136,20 @@ const RecordingInterface = ({onStop, videoRef, canvasRef}: {
             <div className="video-controls">
                 <button
                     className="btn btn-primary shadow-1"
-                    onClick={handleStart}
+                    onClick={onStart}
                     disabled={isRecording}
                 >
                     <RiPlayCircleLine /> Start
                 </button>
                 <button
                     className="btn btn-secondary shadow-1"
-                    onClick={handleRestart}
+                    onClick={onRestart}
                 >
                     <RiRestartLine /> Restart
                 </button>
                 <button
                     className="btn btn-danger shadow-1"
-                    onClick={handleStop}
+                    onClick={onStop}
                     disabled={!isRecording}
                 >
                     <RiStopCircleLine /> Stop
@@ -210,11 +214,18 @@ export const RecordPage = (): JSX.Element => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // Abstracted calibration loop handles AR and returns clean state
-    const { progress, message } = useCalibration(movementId, videoRef, canvasRef);
+    // LIFTED STATE: The page now orchestrates the recording mode
+    const [isRecording, setIsRecording] = useState<boolean>(false);
+
+    const { progress, message } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
 
     if (!movement) return <div>Movement not found</div>;
+
+    const handleStop = () => {
+        setIsRecording(false);
+        navigate(`/movements/replay/${movementId}`);
+    };
 
     return (
         <div className="learn-page">
@@ -243,9 +254,12 @@ export const RecordPage = (): JSX.Element => {
 
             <main className="learn-page__content">
                 <RecordingInterface
+                    isRecording={isRecording}
+                    onStart={() => setIsRecording(true)}
+                    onRestart={() => setIsRecording(false)}
+                    onStop={handleStop}
                     videoRef={videoRef}
                     canvasRef={canvasRef}
-                    onStop={() => navigate(`/movements/replay/${movementId}`)}
                 />
 
                 <aside className="learn-sidebar shadow-1">
