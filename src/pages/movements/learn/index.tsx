@@ -1,26 +1,108 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     RiArrowLeftLine,
     RiPlayFill,
-    RiUploadCloud2Line
+    RiUploadCloud2Line,
+    RiCheckLine
 } from "react-icons/ri";
 import { MOVEMENTS } from '../../../config/movements';
-import { type MovementId } from '../../../types/movements';
+import { type MovementId, type Movement } from '../../../types/movements';
+import { DatabaseEngine } from '../../../engine/db';
 import './style.css';
 
-export const LearnPage = () => {
+/**
+ * Handles file selection, IndexedDB storage, and video preview rendering.
+ */
+const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }): JSX.Element => {
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+
+        try {
+            const db = new DatabaseEngine();
+            await db.saveRecordingBlob(file);
+
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(objectUrl);
+            onUploadSuccess();
+        } catch (error) {
+            console.error("Failed to save video to database:", error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    // Cleanup memory when component unmounts
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
+
+    if (previewUrl) {
+        return (
+            <div className="video-content w-full h-full">
+                <video
+                    src={previewUrl}
+                    controls
+                    className="w-full h-full object-contain bg-black rounded-xl"
+                />
+                <button
+                    className="btn btn-secondary mt-4 shadow-1"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    Upload Different Video
+                </button>
+                <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                />
+            </div>
+        );
+    }
+
+    return (
+        <div className="video-content cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+            <div className="video-icon-circle video-icon-circle--faint">
+                {isUploading ? <RiUploadCloud2Line size={32} className="animate-pulse" /> : <RiUploadCloud2Line size={32} />}
+            </div>
+            <p>
+                <strong>{isUploading ? "Saving..." : "Upload your attempt"}</strong>
+                {!isUploading && " for analysis"}
+            </p>
+            <input
+                type="file"
+                accept="video/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                onClick={(e) => e.stopPropagation()}
+            />
+        </div>
+    );
+};
+
+export const LearnPage = (): JSX.Element => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'demo' | 'upload'>('demo');
+    const [hasUploadedVideo, setHasUploadedVideo] = useState<boolean>(false);
 
-    // Refs for the sliding indicator logic
     const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-    const movement = movementId ? MOVEMENTS[movementId] : null;
+    const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
 
-    // Recalculate indicator position when viewMode changes or window resizes
     useEffect(() => {
         const updateIndicator = () => {
             const activeIndex = viewMode === 'demo' ? 0 : 1;
@@ -41,22 +123,28 @@ export const LearnPage = () => {
 
     if (!movement) return <div>Movement not found</div>;
 
+    const handlePrimaryAction = (): void => {
+        if (viewMode === 'upload' && hasUploadedVideo) {
+            // Skips recording and goes straight to analysis of the uploaded video
+            navigate(`/movements/replay/${movementId}`);
+        } else {
+            // Navigates to camera recording page
+            navigate(`/movements/record/${movementId}`);
+        }
+    };
+
     return (
         <div className="learn-page">
-
-            {/* ROW 1: Navigation */}
             <div className="learn-page__nav">
                 <button onClick={() => navigate('/movements')} className="learn-back-btn">
                     <RiArrowLeftLine /> Back
                 </button>
             </div>
 
-            {/* ROW 2: Header (Title, Tabs, Action) */}
             <header className="learn-page__header">
                 <div className="learn-page__header-left">
                     <h1 className="learn-title">{movement.title}</h1>
 
-                    {/* Sliding Nav Tabs */}
                     <div className="nav-tabs">
                         <div
                             className="nav-tabs-indicator animate shadow-1"
@@ -85,17 +173,16 @@ export const LearnPage = () => {
                 <div className="learn-page__header-right">
                     <button
                         className="btn btn-primary shadow-1"
-                        onClick={() => navigate(`/movements/record/${movementId}`)}
+                        onClick={handlePrimaryAction}
                     >
-                        Start Session
+                        {(viewMode === 'upload' && hasUploadedVideo)
+                            ? <><RiCheckLine /> Analyse Upload</>
+                            : "Start Session"}
                     </button>
                 </div>
             </header>
 
-            {/* ROW 3: Content (Video + Sidebar) */}
             <main className="learn-page__content">
-
-                {/* Left: Video */}
                 <div className="video-container">
                     {viewMode === 'demo' ? (
                         <div className="video-content">
@@ -105,23 +192,15 @@ export const LearnPage = () => {
                             <p><strong>Demonstration</strong> • {movement.title}</p>
                         </div>
                     ) : (
-                        <div className="video-content">
-                            <div className="video-icon-circle video-icon-circle--faint">
-                                <RiUploadCloud2Line size={32} />
-                            </div>
-                            <p><strong>Upload your attempt</strong> for analysis</p>
-                        </div>
+                        <VideoUploader onUploadSuccess={() => setHasUploadedVideo(true)} />
                     )}
                 </div>
 
-                {/* Right: Sidebar */}
                 <aside className="learn-sidebar">
-                    {/* CARD 1: Instructions */}
                     <div className="sidebar-card shadow-1">
                         <div className="sidebar-card__header">
                             <span className="sidebar-card__title">Instructions</span>
                         </div>
-
                         <div className="sidebar-list">
                             {movement.instructions.map((step, index) => (
                                 <div key={index} className="sidebar-row">
@@ -129,20 +208,16 @@ export const LearnPage = () => {
                                         <span className="row-dot dot--orange"></span>
                                         <span className="row-label">STEP {index + 1}</span>
                                     </div>
-                                    <div className="row-content">
-                                        {step}
-                                    </div>
+                                    <div className="row-content">{step}</div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* CARD 2: Guidelines */}
                     <div className="sidebar-card shadow-1">
                         <div className="sidebar-card__header">
                             <span className="sidebar-card__title">Guidelines</span>
                         </div>
-
                         <div className="sidebar-list">
                             {movement.doGuidelines.map((item, index) => (
                                 <div key={`do-${index}`} className="sidebar-row">
@@ -150,9 +225,7 @@ export const LearnPage = () => {
                                         <span className="row-dot dot--green"></span>
                                         <span className="row-label">DO</span>
                                     </div>
-                                    <div className="row-content">
-                                        {item}
-                                    </div>
+                                    <div className="row-content">{item}</div>
                                 </div>
                             ))}
 
@@ -162,9 +235,7 @@ export const LearnPage = () => {
                                         <span className="row-dot dot--red"></span>
                                         <span className="row-label">DON'T</span>
                                     </div>
-                                    <div className="row-content">
-                                        {item}
-                                    </div>
+                                    <div className="row-content">{item}</div>
                                 </div>
                             ))}
                         </div>

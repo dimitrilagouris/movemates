@@ -110,6 +110,32 @@ export class DatabaseEngine {
         }
     }
 
+    /**
+     * Saves a video blob to the recordings store for future analysis.
+     */
+    public async saveRecordingBlob(blob: Blob, key: string = 'lastRecording'): Promise<void> {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('recordings', 'readwrite');
+            const store = tx.objectStore('recordings');
+
+            const req = store.put({
+                id: key,
+                blob: blob,
+                updatedAt: Date.now()
+            });
+
+            req.onsuccess = () => {
+                db.close();
+                resolve();
+            };
+            req.onerror = () => {
+                db.close();
+                reject(req.error);
+            };
+        });
+    }
+
     public async getRecordingBlob(key: string = 'lastRecording'): Promise<Blob | null> {
         return this.getFromStore<Blob>('recordings', key, 'blob');
     }

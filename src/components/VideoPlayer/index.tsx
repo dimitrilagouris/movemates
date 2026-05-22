@@ -8,30 +8,40 @@ export interface VideoPlayerProps {
  * Captures and displays the live webcam feed.
  * Exposes a ref to allow external engines to read the video frames.
  */
-export const VideoPlayer = ({ videoRef }: VideoPlayerProps): JSX.Element => {
+export const VideoPlayer = ({ videoRef }: VideoPlayerProps) => {
     useEffect(() => {
         let stream: MediaStream | null = null;
+        let cancelled = false;
 
         const startCamera = async (): Promise<void> => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1280, height: 720, facingMode: "user" }
+                    video: {
+                        width: 1280,
+                        height: 720,
+                        facingMode: 'user',
+                    },
                 });
 
-                if (videoRef.current) {
+                if (!cancelled && videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
             } catch (err) {
-                console.error("Camera access denied or unavailable", err);
+                console.error('Camera access denied or unavailable', err);
             }
         };
 
-        startCamera();
+        void startCamera();
 
-        // Cleanup tracks to release the camera when the component unmounts
         return () => {
+            cancelled = true;
+
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+
             if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach((track) => track.stop());
             }
         };
     }, [videoRef]);
