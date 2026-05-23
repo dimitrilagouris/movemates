@@ -153,12 +153,15 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     public runCalibrationLogic(landmarksData: LandmarksData, frameThreshold: number = 20): void {
         if (!this.calibration) this.initialiseCalibrationTracker();
 
+        // LATCH: If calibration is finished, freeze it and do nothing else.
+        if (this.calibration.curr_state === 2) return;
+
         const isVisible = checkAllVisible(landmarksData, 0);
-        updateHistory(this.calibration!.visibility, isVisible, frameThreshold);
+        updateHistory(this.calibration.visibility, isVisible, frameThreshold);
 
         const stance = checkStance(landmarksData, 0);
-        updateHistory(this.calibration!.standing_straight, stance.isCorrect, frameThreshold);
-        updateHistory(this.calibration!.armspan, stance.armspan, frameThreshold);
+        updateHistory(this.calibration.standing_straight, stance.isCorrect, frameThreshold);
+        updateHistory(this.calibration.armspan, stance.armspan, frameThreshold);
 
         this.processCalibrationState(frameThreshold);
     }
@@ -211,11 +214,11 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     }
 
     private checkHistoryFullAndTrue(history: boolean[], threshold: number): boolean {
-        return history.length >= threshold && history.every(v => v === true);
+        return history.length >= threshold && history.every(v => v);
     }
 
     private checkHistoryFullAndFalse(history: boolean[], threshold: number): boolean {
-        return history.length >= threshold && history.every(v => v === false);
+        return history.length >= threshold && history.every(v => !v);
     }
 
     private calculateAverageArmspan(): number {
