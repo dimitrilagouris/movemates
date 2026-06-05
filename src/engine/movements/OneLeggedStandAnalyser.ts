@@ -86,7 +86,7 @@ interface SessionState {
 class CalibratingState implements SessionState {
     constructor(private context: OneLeggedStandAnalyser) {}
 
-    public processFrame(data: LandmarksData): void {
+    public processFrame(data: LandmarksData, timestamp: number): void {
         this.context.runCalibrationLogic(data);
     }
 
@@ -98,8 +98,8 @@ class CalibratingState implements SessionState {
 class RecordingState implements SessionState {
     constructor(private context: OneLeggedStandAnalyser) {}
 
-    public processFrame(data: LandmarksData): void {
-        this.context.runAnalysisLogic(data);
+    public processFrame(data: LandmarksData, timestamp: number): void {
+        this.context.runAnalysisLogic(data, timestamp);
     }
 
     public getColour(): string {
@@ -120,40 +120,42 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     private activeState: SessionState;
     private tracker: OneLeggedStandTracker;
     public calibration: CalibrationTracker | null = null;
-    private exerciseAttempts: number = 1;
+    private exerciseAttempts: number = 3;
 
     constructor() {
         this.activeState = new CalibratingState(this);
-        this.tracker = {
+        this.tracker = this.initialiseTracker();
+    }
+
+    private initialiseTracker(): OneLeggedStandTracker {
+        return {
             is_standing: false,
             lifted_leg: null,
             supporting_leg: null,
-            legs_crossed: false
+            legs_crossed: false,
+            armspan: 0,
+            start_time: null,
+            end_time: null,
+            duration: 0,
+            attempt_finished: false,
+            landmark_series: []
         };
     }
 
-    /** Toggles the internal state machine between calibration and recording */
     public setRecordingState(isRecording: boolean): void {
         this.activeState = isRecording ? new RecordingState(this) : new CalibratingState(this);
     }
 
-    /** Delegates mathematical processing to the active state */
     public processFrame(landmarksData: LandmarksData, timestamp: number): void {
         this.activeState.processFrame(landmarksData, timestamp);
     }
 
-    /** Dynamically requests the skeleton colour based on the current mode and math validation */
     public getOverlayColour(): string {
         return this.activeState.getColour();
     }
 
-    /**
-     * Core calibration logic (invoked by CalibratingState)
-     */
     public runCalibrationLogic(landmarksData: LandmarksData, frameThreshold: number = 20): void {
         if (!this.calibration) this.initialiseCalibrationTracker();
-
-        // LATCH: If calibration is finished, freeze it and do nothing else.
         if (this.calibration.curr_state === 2) return;
 
         const isVisible = checkAllVisible(landmarksData, 0);
@@ -166,20 +168,69 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         this.processCalibrationState(frameThreshold);
     }
 
-    /**
-     * Core movement logic (invoked by RecordingState)
-     */
-    public runAnalysisLogic(data: LandmarksData): void {
+    /** Core analysis delegate handles timestamps and state transitions */
+    public runAnalysisLogic(data: LandmarksData, timestamp: number): void {
+        if (this.tracker.attempt_finished) return;
+
         const leftFootY = getCoord(data, 0, LANDMARKS.left_foot_index, 'y');
         const rightFootY = getCoord(data, 0, LANDMARKS.right_foot_index, 'y');
-
-        // Use hip width as a dynamic threshold to account for camera distance
         const leftHipX = getCoord(data, 0, LANDMARKS.left_hip, 'x');
         const rightHipX = getCoord(data, 0, LANDMARKS.right_hip, 'x');
         const hipSpan = Math.abs(leftHipX - rightHipX);
 
-        // Pose is valid if the vertical gap between feet is greater than the hip width
-        this.tracker.is_standing = Math.abs(leftFootY - rightFootY) > hipSpan;
+        const currentlyStanding = Math.abs(leftFootY - rightFootY) > hipSpan;
+
+        if (currentlyStanding && !this.tracker.is_standing) {
+            this.startAttempt(leftFootY, rightFootY, timestamp);
+        } else if (!currentlyStanding && this.tracker.is_standing) {
+            this.finishAttempt(timestamp);
+        }
+
+        if (currentlyStanding) {
+            this.recordActiveFrame(data, timestamp);
+        }
+
+        this.tracker.is_standing = currentlyStanding;
+    }
+
+    /** Triggers upon first detection of raised leg */
+    private startAttempt(leftFootY: number, rightFootY: number, timestamp: number): void {
+        this.tracker.start_time = timestamp / 1000;
+        this.tracker.armspan = this.calibration?.avg_armspan ?? 0;
+
+        if (leftFootY < rightFootY) {
+            this.tracker.lifted_leg = 'left';
+            this.tracker.supporting_leg = 'right';
+        } else {
+            this.tracker.lifted_leg = 'right';
+            this.tracker.supporting_leg = 'left';
+        }
+    }
+
+    /** Completes attempt upon foot lowering */
+    private finishAttempt(timestamp: number): void {
+        if (this.tracker.start_time === null) return;
+        this.tracker.end_time = timestamp / 1000;
+        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100) / 100;
+        this.tracker.attempt_finished = true;
+    }
+
+    /** Buffers the frame array while attempt is active */
+    private recordActiveFrame(data: LandmarksData, timestamp: number): void {
+        this.tracker.landmark_series.push({
+            landmarks: data,
+            timestamp: timestamp / 1000
+        });
+
+        const leftFootX = getCoord(data, 0, LANDMARKS.left_foot_index, 'x');
+        const rightFootX = getCoord(data, 0, LANDMARKS.right_foot_index, 'x');
+
+        // Monitors for incorrect stance where legs cross the midline
+        if (this.tracker.lifted_leg === 'left') {
+            this.tracker.legs_crossed = leftFootX > rightFootX;
+        } else if (this.tracker.lifted_leg === 'right') {
+            this.tracker.legs_crossed = rightFootX < leftFootX;
+        }
     }
 
     private initialiseCalibrationTracker(): void {
@@ -194,22 +245,19 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     }
 
     private processCalibrationState(threshold: number): void {
-        if (!this.calibration) return;
+        if (!this.calibration || this.calibration.curr_state === 2) return;
 
         const isFullyVisible = this.checkHistoryFullAndTrue(this.calibration.visibility, threshold);
         const isFullyInvisible = this.checkHistoryFullAndFalse(this.calibration.visibility, threshold);
         const isStanceCorrect = this.checkHistoryFullAndTrue(this.calibration.standing_straight, threshold);
-        const isStanceIncorrect = this.checkHistoryFullAndFalse(this.calibration.standing_straight, threshold);
 
         if (this.calibration.curr_state === 0 && isFullyVisible) {
             this.calibration.curr_state = 1;
-        } else if (this.calibration.curr_state !== 0 && isFullyInvisible) {
+        } else if (this.calibration.curr_state === 1 && isFullyInvisible) {
             this.calibration.curr_state = 0;
         } else if (this.calibration.curr_state === 1 && isStanceCorrect) {
             this.calibration.curr_state = 2;
             this.calibration.avg_armspan = this.calculateAverageArmspan();
-        } else if (this.calibration.curr_state === 2 && isStanceIncorrect) {
-            this.calibration.curr_state = 1;
         }
     }
 
@@ -228,15 +276,24 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     }
 
     public isPoseValid(): boolean {
-        return this.tracker.is_standing;
+        return this.tracker.is_standing && !this.tracker.legs_crossed;
     }
 
     public calibrationFinished(): boolean {
         return this.calibration?.curr_state === 2;
     }
 
+    /**
+     * Extracted from legacy code: Clones completed attempt data to the array
+     * and resets the instance for the next repetition.
+     */
     public movementFinished(attempts: OneLeggedStandTracker[]): boolean {
-        return false; // Stub for when you implement full attempt tracking
+        if (this.tracker.attempt_finished) {
+            attempts.push(structuredClone(this.tracker));
+            this.tracker = this.initialiseTracker();
+        }
+
+        return attempts.length >= this.exerciseAttempts;
     }
 
     public getCalibrationUIState(): CalibrationUIState {

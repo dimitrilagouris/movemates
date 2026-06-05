@@ -64,7 +64,7 @@ export class OneEuroFilter {
     private dx: LowPassFilter;
     private lastTime?: number;
 
-    constructor(freq: number, mincutoff: number = 1.0, beta: number = 0.0, dcutoff: number = 1.0) {
+    constructor(freq: number, mincutoff: number = 1.0, beta: number = 0.5, dcutoff: number = 1.0) {
         this.freq = freq > 0 ? freq : 30;
         this.mincutoff = mincutoff > 0 ? mincutoff : 1.0;
         this.beta = beta;

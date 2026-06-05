@@ -121,57 +121,55 @@ const useMovementSession = (
         const canvas = canvasRef.current;
         if (!movementId || !video || !canvas) return;
 
-        let animationFrameId: number;
         const detector = detectorRef.current;
         const ctx = canvas.getContext('2d');
 
+        // Declared in the outer closure so the cleanup function can cancel it
+        let callbackId = 0;
+        let isActive = true;
+
+        const processFrame = (_now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata): void => {
+            const analyser = analyserRef.current;
+
+            if (detector.isReady() && ctx && analyser) {
+                if (canvas.width !== video.videoWidth) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // mediaTime is the frame's actual capture timestamp in seconds
+                const timestamp = metadata.mediaTime * 1000;
+                const landmarksData = detector.detect(video, timestamp);
+
+                if (landmarksData?.landmarks[0]) {
+                    analyser.processFrame(landmarksData, timestamp);
+
+                    const uiState = analyser.getCalibrationUIState();
+                    setProgress(uiState.progress);
+                    setMessage(uiState.message);
+
+                    const colour = analyser.getOverlayColour();
+                    drawSkeletonConnections(ctx, landmarksData.landmarks[0], colour);
+                    drawJointPoints(ctx, landmarksData.landmarks[0], colour);
+                }
+            }
+
+            callbackId = video.requestVideoFrameCallback(processFrame);
+        };
+
         const startEngine = async (): Promise<void> => {
             await detector.initialise();
-
-            let lastVideoTime = -1;
-
-            const processFrame = (): void => {
-                const analyser = analyserRef.current;
-
-                if (video.readyState >= 2 && detector.isReady() && ctx && analyser) {
-
-                    if (video.currentTime !== lastVideoTime) {
-                        lastVideoTime = video.currentTime;
-
-                        if (canvas.width !== video.videoWidth) {
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                        }
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                        const timestamp = performance.now();
-                        const landmarksData = detector.detect(video, timestamp);
-
-                        if (landmarksData && landmarksData.landmarks[0]) {
-                            analyser.processFrame(landmarksData, timestamp);
-
-                            const uiState = analyser.getCalibrationUIState();
-                            setProgress(uiState.progress);
-                            setMessage(uiState.message);
-
-                            const activeColour = analyser.getOverlayColour();
-                            const activeFrameLandmarks = landmarksData.landmarks[0];
-
-                            drawSkeletonConnections(ctx, activeFrameLandmarks, activeColour);
-                            drawJointPoints(ctx, activeFrameLandmarks, activeColour);
-                        }
-                    }
-                }
-                animationFrameId = requestAnimationFrame(processFrame);
-            };
-
-            processFrame();
+            if (!isActive) return;
+            callbackId = video.requestVideoFrameCallback(processFrame);
         };
 
         startEngine();
 
         return () => {
-            cancelAnimationFrame(animationFrameId);
+            isActive = false;
+            video.cancelVideoFrameCallback(callbackId);
             detector.close();
         };
     }, [movementId, videoRef, canvasRef]);
