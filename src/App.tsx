@@ -2,15 +2,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/sidebar';
 import { MovementsPage } from './pages/movements';
 import { LearnPage } from './pages/movements/learn';
-import {RecordPage} from "./pages/movements/record";
+import { RecordPage } from "./pages/movements/record";
+import { ReplayPage } from "./pages/movements/replay";
+import { SettingsPage } from "./pages/settings";
 
 import './styles/base.css';
 import './styles/buttons.css';
 import './App.css';
-import {ReplayPage} from "./pages/movements/replay";
 
-
-function App() {
+function App(): JSX.Element {
     return (
         <div className="app">
             <Sidebar />
@@ -23,6 +23,9 @@ function App() {
                     <Route path="/movements/learn/:movementId" element={<LearnPage />} />
                     <Route path="/movements/record/:movementId" element={<RecordPage />} />
                     <Route path="/movements/replay/:movementId" element={<ReplayPage />} />
+
+                    {/* NEW: Settings view registration */}
+                    <Route path="/settings" element={<SettingsPage />} />
                 </Routes>
             </main>
         </div>

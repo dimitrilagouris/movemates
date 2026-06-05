@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     RiSidebarFoldLine,
     RiSidebarUnfoldLine,
@@ -12,16 +13,17 @@ import './style.css';
 import { SidebarItem } from './SidebarItem';
 import { UserProfile } from './UserProfile';
 
-export const Sidebar = () => {
-    const [collapsed, setCollapsed] = useState(false);
-    const [activePage, setActivePage] = useState('Movement');
+export const Sidebar = (): JSX.Element => {
+    const [collapsed, setCollapsed] = useState<boolean>(false);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const toggleCollapse = () => setCollapsed((prev) => !prev);
-    const handleNav = (page: string) => setActivePage(page);
+    const toggleCollapse = (): void => setCollapsed((prev) => !prev);
+
+    const isRouteActive = (path: string): boolean => location.pathname.startsWith(path);
 
     return (
         <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
-            {/* Header */}
             <div className="sidebar__header">
                 <div className="sidebar__logo-container">
                     <span className="sidebar__logo-text">MoveMates</span>
@@ -36,35 +38,33 @@ export const Sidebar = () => {
                 </button>
             </div>
 
-            {/* Main Navigation */}
             <nav className="sidebar__nav">
                 <SidebarItem
                     label="Movement"
                     icon={<RiRunLine size={20} />}
-                    isActive={activePage === 'Movement'}
-                    onClick={() => handleNav('Movement')}
+                    isActive={isRouteActive('/movements')}
+                    onClick={() => navigate('/movements')}
                 />
                 <SidebarItem
                     label="Progress"
                     icon={<RiHeartPulseLine size={20} />}
-                    isActive={activePage === 'Progress'}
-                    onClick={() => handleNav('Progress')}
+                    isActive={isRouteActive('/progress')}
+                    onClick={() => navigate('/progress')}
                 />
                 <SidebarItem
                     label="Help"
                     icon={<RiQuestionLine size={20} />}
-                    isActive={activePage === 'Help'}
-                    onClick={() => handleNav('Help')}
+                    isActive={isRouteActive('/help')}
+                    onClick={() => navigate('/help')}
                 />
             </nav>
 
-            {/* Footer Navigation */}
             <div className="sidebar__footer-nav">
                 <SidebarItem
                     label="Settings"
                     icon={<RiSettings3Line size={20} />}
-                    isActive={activePage === 'Settings'}
-                    onClick={() => handleNav('Settings')}
+                    isActive={isRouteActive('/settings')}
+                    onClick={() => navigate('/settings')}
                 />
 
                 <UserProfile

@@ -507,3 +507,20 @@ p, h1, h2, h3, h4, h5, h6 {
     --tw-shadow: 0px 10px 24px -4px var(--tw-shadow-color,#100c0c1a),0px 8px 12px -4px var(--tw-shadow-color,#100c0c47),0px 0px 2px 0px var(--tw-shadow-color,#100c0c1a),0px 1px 2px 0px var(--tw-shadow-color,#100c0c1a);
     box-shadow: var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)
 }
+
+:root {
+    /* Spacing Scale (4px increments) */
+    --space-0: 0px;
+    --space-1: 4px;   /* Micro gaps */
+    --space-2: 8px;   /* Small gaps */
+    --space-3: 12px;
+    --space-4: 16px;  /* Base padding */
+    --space-5: 20px;
+    --space-6: 24px;  /* Medium padding */
+    --space-8: 32px;  /* Large gaps */
+    --space-10: 40px;
+    --space-12: 48px; /* Macro gaps */
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+}
