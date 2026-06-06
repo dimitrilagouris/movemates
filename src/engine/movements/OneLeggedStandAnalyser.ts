@@ -121,6 +121,7 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
     private tracker: OneLeggedStandTracker;
     public calibration: CalibrationTracker | null = null;
     private exerciseAttempts: number = 3;
+    private footDownFrames: number = 0;
 
     constructor() {
         this.activeState = new CalibratingState(this);
@@ -178,19 +179,31 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         const rightHipX = getCoord(data, 0, LANDMARKS.right_hip, 'x');
         const hipSpan = Math.abs(leftHipX - rightHipX);
 
-        const currentlyStanding = Math.abs(leftFootY - rightFootY) > hipSpan;
-
-        if (currentlyStanding && !this.tracker.is_standing) {
-            this.startAttempt(leftFootY, rightFootY, timestamp);
-        } else if (!currentlyStanding && this.tracker.is_standing) {
-            this.finishAttempt(timestamp);
-        }
+        // A leg is lifted if the vertical distance between the feet is significant.
+        // We use Math.max to ensure that even if hipSpan is very small (due to camera angle), 
+        // a minimum vertical lift of 0.08 normalized units is required to trigger.
+        const currentlyStanding = Math.abs(leftFootY - rightFootY) > Math.max(hipSpan * 1.2, 0.08);
 
         if (currentlyStanding) {
+            this.footDownFrames = 0;
+            if (!this.tracker.is_standing) {
+                this.startAttempt(leftFootY, rightFootY, timestamp);
+            }
+            this.tracker.is_standing = true;
             this.recordActiveFrame(data, timestamp);
+        } else {
+            if (this.tracker.is_standing) {
+                this.footDownFrames++;
+                // Wait for roughly 0.5 seconds (15 frames at 30fps) of the foot being down
+                // before officially ending the attempt. This prevents camera glitches from ending it early.
+                if (this.footDownFrames > 15) {
+                    this.finishAttempt(timestamp);
+                    this.tracker.is_standing = false;
+                } else {
+                    this.recordActiveFrame(data, timestamp);
+                }
+            }
         }
-
-        this.tracker.is_standing = currentlyStanding;
     }
 
     /** Triggers upon first detection of raised leg */
@@ -207,11 +220,24 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         }
     }
 
-    /** Completes attempt upon foot lowering */
+    /** Completes attempt upon foot lowering, rejecting noise (short durations) */
     private finishAttempt(timestamp: number): void {
         if (this.tracker.start_time === null) return;
-        this.tracker.end_time = timestamp / 1000;
-        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100) / 100;
+        
+        const endTime = timestamp / 1000;
+        const duration = Math.round((endTime - this.tracker.start_time) * 100) / 100;
+        
+        // Filter out noise (e.g. tracking flickers) by requiring at least 1 second
+        if (duration < 1.0) {
+            this.tracker.start_time = null;
+            this.tracker.lifted_leg = null;
+            this.tracker.supporting_leg = null;
+            this.tracker.landmark_series = [];
+            return;
+        }
+
+        this.tracker.end_time = endTime;
+        this.tracker.duration = duration;
         this.tracker.attempt_finished = true;
     }
 

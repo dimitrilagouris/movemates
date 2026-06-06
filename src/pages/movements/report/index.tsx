@@ -1,11 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { RiArrowLeftLine, RiFileChartLine, RiAlertLine } from "react-icons/ri";
+import { 
+    RiArrowLeftLine, RiFileChartLine, RiAlertLine, 
+    RiTimerLine, RiUserLine, RiScales3Line, RiRulerLine, 
+    RiMore2Fill, RiArrowDownLine, RiCheckLine, RiCloseLine 
+} from "react-icons/ri";
+import { 
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+} from 'recharts';
 import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
 import { DatabaseEngine } from '../../../engine/db';
 import { Button } from '../../../components/common/Button';
+import { StatCard } from '../../../components/common/StatCard';
 import { type OneLeggedStandTracker } from '../../../engine/movements/OneLeggedStandAnalyser';
+import { getShoulderAbduction, getHipAbduction, getKneeValgus } from '../../../engine/math/geometry';
 import './style.css';
 
 export const ReportPage = () => {
@@ -49,7 +58,7 @@ export const ReportPage = () => {
     const latestTracker = attempts[0]; // Assuming only one tracker state is stored per session
 
     return (
-        <div className="learn-page">
+        <div className="report-container">
             <div className="learn-page__nav">
                 <Button
                     variant="text"
@@ -85,51 +94,222 @@ export const ReportPage = () => {
     );
 };
 
+// Custom tooltip component for Recharts
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="custom-tooltip">
+                <p className="custom-tooltip-label">{`${label}s`}</p>
+                {payload.map((entry: any, index: number) => (
+                    <p key={`item-${index}`} className="custom-tooltip-item" style={{ color: entry.color }}>
+                        {entry.name}: {entry.value}°
+                    </p>
+                ))}
+            </div>
+        );
+    }
+    return null;
+};
+
 const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) => {
     const isSuccessDuration = tracker.duration > 10;
     const isCorrectForm = !tracker.legs_crossed;
 
+    const chartData = useMemo(() => {
+        if (!tracker.landmark_series || tracker.landmark_series.length === 0) return [];
+        
+        const startTime = tracker.landmark_series[0].timestamp;
+
+        return tracker.landmark_series.map((frame) => {
+            const lms = frame.landmarks.landmarks[0];
+            if (!lms) return null;
+
+            const lShoulder = lms[11], rShoulder = lms[12];
+            const lElbow = lms[13], rElbow = lms[14];
+            const lHip = lms[23], rHip = lms[24];
+            const lKnee = lms[25], rKnee = lms[26];
+            const lAnkle = lms[27], rAnkle = lms[28];
+
+            if (!lShoulder || !rShoulder || !lElbow || !rElbow || !lHip || !rHip || !lKnee || !rKnee || !lAnkle || !rAnkle) return null;
+
+            return {
+                time: Math.round((frame.timestamp - startTime) * 10) / 10,
+                lShoulderAbd: getShoulderAbduction(lShoulder, lElbow, lHip),
+                rShoulderAbd: getShoulderAbduction(rShoulder, rElbow, rHip),
+                lHipAbd: getHipAbduction(lShoulder, lHip, lKnee),
+                rHipAbd: getHipAbduction(rShoulder, rHip, rKnee),
+                lKneeValgus: getKneeValgus(lHip, lKnee, lAnkle),
+                rKneeValgus: getKneeValgus(rHip, rKnee, rAnkle),
+            };
+        }).filter(Boolean);
+    }, [tracker.landmark_series]);
+
+    const maxVals = useMemo(() => {
+        if (!chartData.length) return null;
+        return {
+            lShoulder: Math.max(...chartData.map(d => d.lShoulderAbd)),
+            rShoulder: Math.max(...chartData.map(d => d.rShoulderAbd)),
+            lHip: Math.max(...chartData.map(d => d.lHipAbd)),
+            rHip: Math.max(...chartData.map(d => d.rHipAbd)),
+            lKnee: Math.max(...chartData.map(d => d.lKneeValgus)),
+            rKnee: Math.max(...chartData.map(d => d.rKneeValgus)),
+        }
+    }, [chartData]);
+
     return (
-        <div className="report-content">
-            <div className="report-card shadow-1">
-                <div className="report-card__title">Hold Duration</div>
-                <div className={`report-card__value ${isSuccessDuration ? 'success' : 'error'}`}>
-                    {tracker.duration.toFixed(2)}s
-                </div>
-                <div className="report-card__detail">
-                    {isSuccessDuration ? "Great balance! You held it for over 10 seconds." : "Keep practicing to improve your balance time."}
-                </div>
+        <>
+            <div className="report-stats-row">
+                {/* Card 1: Hold Duration */}
+                <StatCard 
+                    title="Hold Duration"
+                    icon={<RiTimerLine />}
+                    value={`${tracker.duration.toFixed(2)}s`}
+                    status={isSuccessDuration ? 'success' : 'error'}
+                    statusIcon={isSuccessDuration ? <RiCheckLine /> : <RiArrowDownLine />}
+                    statusText={isSuccessDuration ? "Great balance!" : "Keep practicing"}
+                    detailText="Overall time"
+                />
+
+                {/* Card 2: Leg Used */}
+                <StatCard 
+                    title="Leg Used"
+                    icon={<RiUserLine />}
+                    value={tracker.lifted_leg ? (tracker.lifted_leg === 'left' ? "Left" : "Right") : "N/A"}
+                    status="neutral"
+                    statusIcon={<RiCheckLine />}
+                    statusText="Recorded"
+                    detailText={`Supporting: ${tracker.supporting_leg ?? "N/A"}`}
+                />
+
+                {/* Card 3: Form Accuracy */}
+                <StatCard 
+                    title="Form Accuracy"
+                    icon={<RiScales3Line />}
+                    value={isCorrectForm ? "Correct" : "Incorrect"}
+                    status={isCorrectForm ? 'success' : 'error'}
+                    statusIcon={isCorrectForm ? <RiCheckLine /> : <RiCloseLine />}
+                    statusText={isCorrectForm ? "Perfect form" : "Crossed midline"}
+                    detailText="Legs position"
+                />
+
+                {/* Card 4: Calibrated Armspan */}
+                <StatCard 
+                    title="Armspan"
+                    icon={<RiRulerLine />}
+                    value={tracker.armspan > 0 ? `${tracker.armspan.toFixed(2)}m` : "N/A"}
+                    status="neutral"
+                    statusIcon={<RiCheckLine />}
+                    statusText="Calibrated"
+                    detailText="Initial phase"
+                />
             </div>
 
-            <div className="report-card shadow-1">
-                <div className="report-card__title">Leg Used</div>
-                <div className="report-card__value">
-                    {tracker.lifted_leg ? (tracker.lifted_leg === 'left' ? "Left Leg Lifted" : "Right Leg Lifted") : "N/A"}
+            <div className="report-charts-row">
+                {/* Shoulder Abduction Chart */}
+                <div className="report-card report-card--chart">
+                    <div className="chart-header">
+                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Shoulder Abduction</div>
+                        <div className="chart-stats-row">
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lShoulder}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                            <div className="chart-stat-divider"></div>
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rShoulder}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#e4e4e7" />
+                            <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Line type="monotone" dataKey="lShoulderAbd" name="Left Shoulder" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rShoulderAbd" name="Right Shoulder" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
-                <div className="report-card__detail">
-                    Supporting leg: {tracker.supporting_leg ?? "N/A"}
-                </div>
-            </div>
 
-            <div className="report-card shadow-1">
-                <div className="report-card__title">Form Accuracy</div>
-                <div className={`report-card__value ${isCorrectForm ? 'success' : 'error'}`}>
-                    {isCorrectForm ? "Correct" : "Incorrect"}
+                {/* Hip Abduction Chart */}
+                <div className="report-card report-card--chart">
+                    <div className="chart-header">
+                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Hip Abduction</div>
+                        <div className="chart-stats-row">
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lHip}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                            <div className="chart-stat-divider"></div>
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rHip}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#e4e4e7" />
+                            <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Line type="monotone" dataKey="lHipAbd" name="Left Hip" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rHipAbd" name="Right Hip" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
-                <div className="report-card__detail">
-                    {isCorrectForm ? "Legs remained uncrossed during the exercise." : "Legs crossed the midline. Focus on keeping your lifted leg straight."}
-                </div>
-            </div>
 
-            <div className="report-card shadow-1">
-                <div className="report-card__title">Calibrated Armspan</div>
-                <div className="report-card__value">
-                    {tracker.armspan > 0 ? `${tracker.armspan.toFixed(2)}m` : "N/A"}
-                </div>
-                <div className="report-card__detail">
-                    Measured during the initial stance calibration phase.
+                {/* Knee Valgus Chart */}
+                <div className="report-card report-card--chart" style={{ gridColumn: '1 / -1' }}>
+                    <div className="chart-header">
+                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Knee Valgus Deviation</div>
+                        <div className="chart-stats-row">
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lKnee}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                            <div className="chart-stat-divider"></div>
+                            <div className="chart-stat-block">
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rKnee}°</div>
+                                <div className="chart-stat-info">
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-desc">Maximum degrees</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#e4e4e7" />
+                            <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Line type="monotone" dataKey="lKneeValgus" name="Left Knee" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rKneeValgus" name="Right Knee" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
-        </div>
+        </>
     );
 };

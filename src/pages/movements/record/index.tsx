@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type RefObject } from 'react';
+import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     RiArrowLeftLine,
@@ -28,7 +28,7 @@ const useVideoRecorder = (
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<BlobPart[]>([]);
 
-    const start = (): void => {
+    const start = useCallback((): void => {
         const stream = videoRef.current?.srcObject as MediaStream | undefined;
         if (!stream) return;
 
@@ -58,23 +58,23 @@ const useVideoRecorder = (
 
         recorder.start();
         setIsRecording(true);
-    };
+    }, [videoRef, setIsRecording, onSaved]);
 
-    const stop = (): void => {
+    const stop = useCallback((): void => {
         if (mediaRecorderRef.current?.state === 'recording') {
             mediaRecorderRef.current.stop(); // Triggers onstop, saving the DB file and navigating
             setIsRecording(false);
         }
-    };
+    }, [setIsRecording]);
 
-    const restart = (): void => {
+    const restart = useCallback((): void => {
         if (mediaRecorderRef.current?.state === 'recording') {
             mediaRecorderRef.current.onstop = null; // Disconnect listener so it doesn't save to DB
             mediaRecorderRef.current.stop();
         }
         chunksRef.current = [];
         setIsRecording(false);
-    };
+    }, [setIsRecording]);
 
     // Cleanup hanging recordings if user navigates away unexpectedly
     useEffect(() => {
@@ -100,6 +100,7 @@ const useMovementSession = (
 ) => {
     const [progress, setProgress] = useState<number>(0);
     const [message, setMessage] = useState<string>("Loading AR tracking engine...");
+    const [isAttemptFinished, setIsAttemptFinished] = useState<boolean>(false);
 
     const detectorRef = useRef(new MediaPipeDetector());
     const analyserRef = useRef<MovementAnalyser<any> | null>(null);
@@ -151,6 +152,11 @@ const useMovementSession = (
                     setProgress(uiState.progress);
                     setMessage(uiState.message);
 
+                    const trackerState = analyser.getTrackerState();
+                    if (trackerState?.attempt_finished) {
+                        setIsAttemptFinished(true);
+                    }
+
                     const colour = analyser.getOverlayColour();
                     drawSkeletonConnections(ctx, landmarksData.landmarks[0], colour);
                     drawJointPoints(ctx, landmarksData.landmarks[0], colour);
@@ -175,7 +181,7 @@ const useMovementSession = (
         };
     }, [movementId, videoRef, canvasRef]);
 
-    return { progress, message, analyserRef };
+    return { progress, message, analyserRef, isAttemptFinished };
 };
 
 /**
@@ -274,11 +280,12 @@ export const RecordPage = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [isRecording, setIsRecording] = useState<boolean>(false);
+    const hasAutoStarted = useRef<boolean>(false);
 
-    const { progress, message, analyserRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+    const { progress, message, analyserRef, isAttemptFinished } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
     // Initialise recorder and wire the stop event to trigger navigation
-    const handleSavedAndNavigate = () => {
+    const handleSavedAndNavigate = useCallback(() => {
         if (analyserRef.current) {
             const trackerState = analyserRef.current.getTrackerState();
             const db = new DatabaseEngine();
@@ -288,17 +295,25 @@ export const RecordPage = () => {
         } else {
             navigate(`/movements/replay/${movementId}`);
         }
-    };
+    }, [movementId, navigate, analyserRef]);
+    
     const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
 
     // Auto-start recording when calibration completes
     useEffect(() => {
         // We scope this strictly to the one-legged stand as requested
-        if (movementId == 'one-legged-stand' && progress == 100 && !isRecording) {
+        if (movementId === 'one-legged-stand' && progress === 100 && !isRecording && !hasAutoStarted.current) {
+            hasAutoStarted.current = true;
             start();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [progress, movementId, isRecording]);
+    }, [progress, movementId, isRecording, start]);
+
+    // Auto-stop recording when the attempt finishes
+    useEffect(() => {
+        if (movementId == 'one-legged-stand' && isAttemptFinished && isRecording) {
+            stop();
+        }
+    }, [isAttemptFinished, movementId, isRecording, stop]);
 
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
     if (!movement) return <div>Movement not found</div>;
