@@ -52,7 +52,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
     fftGranularity: 128,
     freqResponse: [0.0],
     throwingArm: 'Right',
-    swingAngle: 100
+    swingAngle: 100,
+    userName: 'Mover'
 };
 
 // --- Database Engine ---
