@@ -16,6 +16,7 @@ import { drawSkeletonConnections, drawJointPoints } from '../../../engine/mediap
 import { DatabaseEngine } from '../../../engine/db';
 import './style.css';
 import {Button} from "../../../components/common/Button.tsx";
+import { getLiveMetricsCard } from '../../../components/live-metrics/LiveMetricsRegistry';
 
 /**
  * Manages the native MediaRecorder API to capture, encode, and store video.
@@ -274,80 +275,6 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Ele
     </div>
 );
 
-const LiveMetricsCard = ({ movementId, analyserRef, currentTimestampRef }: { movementId: MovementId | undefined, analyserRef: RefObject<MovementAnalyser<any> | null>, currentTimestampRef: RefObject<number> }): JSX.Element | null => {
-    const [metrics, setMetrics] = useState<{ duration: string, liftedLeg: string, validPosture: string } | null>(null);
-
-    useEffect(() => {
-        let frameId: number;
-        
-        const update = () => {
-            if (analyserRef.current) {
-                const tracker = analyserRef.current.getTrackerState();
-                const isValid = analyserRef.current.isPoseValid();
-                
-                if (movementId === 'one-legged-stand') {
-                    const olsTracker = tracker as any;
-                    
-                    let durationStr = '0.000';
-                    if (olsTracker.attempt_finished) {
-                        durationStr = (olsTracker.duration || 0).toFixed(3);
-                    } else if (olsTracker.start_time !== null) {
-                        const currentSecs = currentTimestampRef.current / 1000;
-                        durationStr = Math.max(0, currentSecs - olsTracker.start_time).toFixed(3);
-                    }
-                    
-                    let legLabel = 'None';
-                    if (olsTracker.lifted_leg === 'left') legLabel = 'Left';
-                    else if (olsTracker.lifted_leg === 'right') legLabel = 'Right';
-                    
-                    setMetrics({
-                        duration: durationStr,
-                        liftedLeg: legLabel,
-                        validPosture: isValid ? 'Yes' : 'No'
-                    });
-                }
-            }
-            frameId = requestAnimationFrame(update);
-        };
-        
-        frameId = requestAnimationFrame(update);
-        return () => cancelAnimationFrame(frameId);
-    }, [movementId, analyserRef, currentTimestampRef]);
-
-    if (!metrics) return null;
-
-    return (
-        <div className="sidebar-card shadow-1 live-metrics-card">
-            <div className="live-metrics-top">
-                <div className="live-metrics-duration-value">{metrics.duration}</div>
-                <div className="live-metrics-duration-label">Duration (Seconds)</div>
-            </div>
-            <div className="live-metrics-bottom">
-                <div className="live-metrics-col">
-                    <div className="live-metrics-col-header">
-                        <span className="live-metrics-col-title">Leg Lifted</span>
-                    </div>
-                    <div className={`live-metrics-col-value live-metrics-mono ${metrics.liftedLeg === 'None' ? 'live-metrics-col-value--faint' : ''}`}>
-                        {metrics.liftedLeg || 'None'}
-                    </div>
-                </div>
-                <div className="live-metrics-col">
-                    <div className="live-metrics-col-header">
-                        <span className="live-metrics-col-title">Posture</span>
-                    </div>
-                    <div className="live-metrics-col-value">
-                        {metrics.validPosture === 'Yes' ? (
-                            <span className="live-metrics-badge live-metrics-badge--yes live-metrics-mono">{metrics.validPosture}</span>
-                        ) : (
-                            <span className="live-metrics-badge live-metrics-badge--no live-metrics-mono">{metrics.validPosture}</span>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export const RecordPage = () => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
@@ -394,6 +321,8 @@ export const RecordPage = () => {
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
     if (!movement) return <div>Movement not found</div>;
 
+    const LiveMetricsComponent = getLiveMetricsCard(movementId);
+
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
@@ -433,7 +362,13 @@ export const RecordPage = () => {
 
                 <aside className="learn-sidebar shadow-1">
                     <CalibrationCard progress={progress} message={message} />
-                    <LiveMetricsCard movementId={movementId} analyserRef={analyserRef} currentTimestampRef={currentTimestampRef} />
+                    {LiveMetricsComponent && (
+                        <LiveMetricsComponent 
+                            movementId={movementId!} 
+                            analyserRef={analyserRef} 
+                            currentTimestampRef={currentTimestampRef} 
+                        />
+                    )}
                     <InstructionsCard instructions={movement.instructions} />
                 </aside>
             </main>
