@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, useRef } from 'react';
 import {
-    RiErrorWarningLine, RiSaveLine, RiDownloadLine,
-    RiUploadLine, RiRestartLine, RiMagicLine
+    RiErrorWarningFill, RiSaveFill, RiDownloadFill,
+    RiUploadFill, RiRestartLine, RiMagicFill
 } from "react-icons/ri";
 import { DatabaseEngine, type AppSettings, DEFAULT_SETTINGS } from '../../engine/db/DatabaseEngine';
 import { LANDMARK_NAMES } from '../../types/landmarks';
@@ -312,11 +312,11 @@ export const SettingsPage = () => {
                     <div className="settings-header__top">
                         <h1>Settings</h1>
                         <div className="settings-global-actions">
-                            <Button variant="secondary" size="small" onClick={exportJSON}>
-                                <RiDownloadLine className="inline-icon" /> Export
+                            <Button variant="secondary"  onClick={exportJSON}>
+                                <RiDownloadFill className="inline-icon" /> Export
                             </Button>
-                            <Button variant="secondary" size="small" onClick={() => fileInputRef.current?.click()}>
-                                <RiUploadLine className="inline-icon" /> Import
+                            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                                <RiUploadFill className="inline-icon" /> Import
                             </Button>
                             <input type="file" className="hidden" accept=".json" ref={fileInputRef} onChange={importJSON} />
                         </div>
@@ -327,7 +327,7 @@ export const SettingsPage = () => {
                 <main className="settings-content">
                     {hasUnsavedChanges && (
                         <div className="settings-banner">
-                            <div className="settings-banner__icon"><RiErrorWarningLine size={24} /></div>
+                            <div className="settings-banner__icon"><RiErrorWarningFill size={24} /></div>
                             <div className="settings-banner__content">
                                 <h3>Unsaved Changes</h3>
                                 <p>You have modified your configuration. Remember to save below.</p>
@@ -369,7 +369,7 @@ export const SettingsPage = () => {
                         <div className="settings-action-bar__right">
                             {settings.filterMethod === 'local' && selectedLandmarks.size > 0 && activeTab === 'Filters' && (
                                 <Button variant="secondary" onClick={handleApplyLocal}>
-                                    <RiMagicLine className="inline-icon" /> Apply to {selectedLandmarks.size} Selected
+                                    <RiMagicFill className="inline-icon" /> Apply to {selectedLandmarks.size} Selected
                                 </Button>
                             )}
                             <Button
@@ -378,7 +378,7 @@ export const SettingsPage = () => {
                                 disabled={!hasUnsavedChanges}
                                 style={{ opacity: hasUnsavedChanges ? 1 : 0.5 }}
                             >
-                                <RiSaveLine className="inline-icon" />
+                                <RiSaveFill className="inline-icon" />
                                 {hasUnsavedChanges ? "Save Changes" : "Saved"}
                             </Button>
                         </div>

@@ -68,7 +68,7 @@ export const Sidebar = (): JSX.Element => {
                 />
 
                 <UserProfile
-                    name="Dimitri Lagouris"
+                    name="Account"
                     avatarUrl=""
                 />
             </div>
