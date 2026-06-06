@@ -4,12 +4,13 @@ import { RiArrowLeftLine, RiArrowRightLine, RiFilmLine } from "react-icons/ri";
 import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
 import { DatabaseEngine } from '../../../engine/db';
+import { Button } from '../../../components/common/Button';
 import './style.css';
 
 /**
  * Handles fetching the stored video file from IndexedDB and managing its local URL lifetime.
  */
-const ReplayPlayer = (): JSX.Element => {
+const ReplayPlayer = () => {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -29,7 +30,6 @@ const ReplayPlayer = (): JSX.Element => {
 
         loadStoredVideo();
 
-        // Prevent memory leaks by cleaning up the temporary object URL on unmount
         return () => {
             if (activeUrl) URL.revokeObjectURL(activeUrl);
         };
@@ -61,10 +61,7 @@ const ReplayPlayer = (): JSX.Element => {
     );
 };
 
-/**
- * Renders informational contextual stats for the review panel sidebar card.
- */
-const SessionSummaryCard = (): JSX.Element => (
+const SessionSummaryCard = () => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
             <span className="sidebar-card__title">Session Captured</span>
@@ -83,10 +80,7 @@ const SessionSummaryCard = (): JSX.Element => (
     </div>
 );
 
-/**
- * Main Replay Page orchestration view.
- */
-export const ReplayPage = (): JSX.Element => {
+export const ReplayPage = () => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
@@ -96,12 +90,13 @@ export const ReplayPage = (): JSX.Element => {
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
-                <button
+                <Button
+                    variant="text"
                     onClick={() => navigate(`/movements/record/${movementId}`)}
                     className="learn-back-btn"
                 >
                     <RiArrowLeftLine /> Back to Record
-                </button>
+                </Button>
             </div>
 
             <header className="learn-page__header">
@@ -109,12 +104,13 @@ export const ReplayPage = (): JSX.Element => {
                     <h1 className="learn-title">Review Session: {movement.title}</h1>
                 </div>
                 <div className="learn-page__header-right">
-                    <button
-                        className="btn btn-primary shadow-1"
+                    <Button
+                        variant="primary"
+                        className="shadow-1"
                         onClick={() => navigate(`/movements/report/${movementId}`)}
                     >
                         Generate Assessment Report <RiArrowRightLine />
-                    </button>
+                    </Button>
                 </div>
             </header>
 

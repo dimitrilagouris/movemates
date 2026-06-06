@@ -15,6 +15,7 @@ import { type MovementAnalyser } from '../../../types/MovementAnalyser';
 import { drawSkeletonConnections, drawJointPoints } from '../../../engine/mediapipe/drawing';
 import { DatabaseEngine } from '../../../engine/db';
 import './style.css';
+import {Button} from "../../../components/common/Button.tsx";
 
 /**
  * Manages the native MediaRecorder API to capture, encode, and store video.
@@ -265,7 +266,7 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Ele
     </div>
 );
 
-export const RecordPage = (): JSX.Element => {
+export const RecordPage = () => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
 
@@ -280,18 +281,28 @@ export const RecordPage = (): JSX.Element => {
 
     const { progress, message } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
+    // Auto-start recording when calibration completes
+    useEffect(() => {
+        // We scope this strictly to the one-legged stand as requested
+        if (movementId == 'one_legged_stand' && progress == 100 && !isRecording) {
+            start();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [progress, movementId, isRecording]);
+
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
     if (!movement) return <div>Movement not found</div>;
 
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
-                <button
+                <Button
+                    variant="text"
                     onClick={() => navigate(`/movements/learn/${movementId}`)}
                     className="learn-back-btn"
                 >
                     <RiArrowLeftLine /> Back
-                </button>
+                </Button>
             </div>
 
             <header className="learn-page__header">
@@ -299,12 +310,13 @@ export const RecordPage = (): JSX.Element => {
                     <h1 className="learn-title">{movement.title}</h1>
                 </div>
                 <div className="learn-page__header-right">
-                    <button
-                        className="btn btn-primary shadow-1"
+                    <Button
+                        variant="primary"
+                        className="shadow-1"
                         onClick={() => navigate(`/movements/replay/${movementId}`)}
                     >
                         View Replay
-                    </button>
+                    </Button>
                 </div>
             </header>
 
