@@ -175,7 +175,7 @@ const useMovementSession = (
         };
     }, [movementId, videoRef, canvasRef]);
 
-    return { progress, message };
+    return { progress, message, analyserRef };
 };
 
 /**
@@ -275,16 +275,26 @@ export const RecordPage = () => {
 
     const [isRecording, setIsRecording] = useState<boolean>(false);
 
-    // Initialise recorder and wire the stop event to trigger navigation
-    const handleSavedAndNavigate = () => navigate(`/movements/replay/${movementId}`);
-    const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
+    const { progress, message, analyserRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
-    const { progress, message } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+    // Initialise recorder and wire the stop event to trigger navigation
+    const handleSavedAndNavigate = () => {
+        if (analyserRef.current) {
+            const trackerState = analyserRef.current.getTrackerState();
+            const db = new DatabaseEngine();
+            db.saveAttemptsData('lastRecording_attempts', [trackerState]).then(() => {
+                navigate(`/movements/replay/${movementId}`);
+            });
+        } else {
+            navigate(`/movements/replay/${movementId}`);
+        }
+    };
+    const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
 
     // Auto-start recording when calibration completes
     useEffect(() => {
         // We scope this strictly to the one-legged stand as requested
-        if (movementId == 'one_legged_stand' && progress == 100 && !isRecording) {
+        if (movementId == 'one-legged-stand' && progress == 100 && !isRecording) {
             start();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

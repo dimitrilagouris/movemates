@@ -283,6 +283,10 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         return this.calibration?.curr_state === 2;
     }
 
+    public getTrackerState(): OneLeggedStandTracker {
+        return this.tracker;
+    }
+
     /**
      * Extracted from legacy code: Clones completed attempt data to the array
      * and resets the instance for the next repetition.

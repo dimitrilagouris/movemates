@@ -142,6 +142,29 @@ export class DatabaseEngine {
         return this.getFromStore<Blob>('recordings', key, 'blob');
     }
 
+    public async saveAttemptsData(key: string, attempts: unknown[]): Promise<void> {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('attemptsData', 'readwrite');
+            const store = tx.objectStore('attemptsData');
+
+            const req = store.put({
+                id: key,
+                attempts: attempts,
+                updatedAt: Date.now()
+            });
+
+            req.onsuccess = () => {
+                db.close();
+                resolve();
+            };
+            req.onerror = () => {
+                db.close();
+                reject(req.error);
+            };
+        });
+    }
+
     public async getLandmarks(storeName: StoreName, key: string): Promise<LandmarkFrame[] | null> {
         // Assume 'worldLandmarks' key contains world data, otherwise 'landmarks'
         const extractKey = storeName.includes('world') ? 'worldLandmarks' : 'landmarks';

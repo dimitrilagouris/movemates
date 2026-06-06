@@ -41,6 +41,7 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
 
     public isPoseValid(): boolean { return false; }
     public movementFinished(attempts: UnderarmThrowTracker[]): boolean { return false; }
+    public getTrackerState(): UnderarmThrowTracker { return this.tracker as UnderarmThrowTracker; }
 
     /** Validates if the elbow is correctly positioned below the shoulder and not overly bent. */
     private validateLiveTechnique(landmarksData: LandmarksData, frameIndex: number): { isValid: boolean, messages: string[] } {

@@ -60,6 +60,9 @@ export interface MovementAnalyser<TTracker extends BaseMovementTracker> {
     /** Dynamically requests the skeleton colour based on the current state */
     getOverlayColour(): string;
 
+    /** Returns the current tracker state */
+    getTrackerState(): TTracker;
+
 }
 
 export interface CalibrationUIState {

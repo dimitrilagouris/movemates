@@ -4,6 +4,7 @@ import { MovementsPage } from './pages/movements';
 import { LearnPage } from './pages/movements/learn';
 import { RecordPage } from "./pages/movements/record";
 import { ReplayPage } from "./pages/movements/replay";
+import { ReportPage } from "./pages/movements/report";
 import { SettingsPage } from "./pages/settings";
 
 import './styles/base.css';
@@ -23,6 +24,7 @@ function App(): JSX.Element {
                     <Route path="/movements/learn/:movementId" element={<LearnPage />} />
                     <Route path="/movements/record/:movementId" element={<RecordPage />} />
                     <Route path="/movements/replay/:movementId" element={<ReplayPage />} />
+                    <Route path="/movements/report/:movementId" element={<ReportPage />} />
 
                     {/* NEW: Settings view registration */}
                     <Route path="/settings" element={<SettingsPage />} />
