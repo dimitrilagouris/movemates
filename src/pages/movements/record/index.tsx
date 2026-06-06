@@ -275,7 +275,7 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Ele
 );
 
 const LiveMetricsCard = ({ movementId, analyserRef, currentTimestampRef }: { movementId: MovementId | undefined, analyserRef: RefObject<MovementAnalyser<any> | null>, currentTimestampRef: RefObject<number> }): JSX.Element | null => {
-    const [metrics, setMetrics] = useState<{label: string, value: string}[]>([]);
+    const [metrics, setMetrics] = useState<{ duration: string, liftedLeg: string, validPosture: string } | null>(null);
 
     useEffect(() => {
         let frameId: number;
@@ -288,20 +288,23 @@ const LiveMetricsCard = ({ movementId, analyserRef, currentTimestampRef }: { mov
                 if (movementId === 'one-legged-stand') {
                     const olsTracker = tracker as any;
                     
-                    let durationStr = '0.0s';
+                    let durationStr = '0.000';
                     if (olsTracker.attempt_finished) {
-                        durationStr = (olsTracker.duration || 0).toFixed(1) + 's';
+                        durationStr = (olsTracker.duration || 0).toFixed(3);
                     } else if (olsTracker.start_time !== null) {
                         const currentSecs = currentTimestampRef.current / 1000;
-                        durationStr = Math.max(0, currentSecs - olsTracker.start_time).toFixed(1) + 's';
+                        durationStr = Math.max(0, currentSecs - olsTracker.start_time).toFixed(3);
                     }
                     
-                    setMetrics([
-                        { label: 'Standing on one leg', value: olsTracker.is_standing ? 'Yes' : 'No' },
-                        { label: 'Lifted Leg', value: olsTracker.lifted_leg ? (olsTracker.lifted_leg === 'left' ? 'Left' : 'Right') : '-' },
-                        { label: 'Duration', value: durationStr },
-                        { label: 'Valid Posture', value: isValid ? 'Yes' : 'No' }
-                    ]);
+                    let legLabel = 'None';
+                    if (olsTracker.lifted_leg === 'left') legLabel = 'Left';
+                    else if (olsTracker.lifted_leg === 'right') legLabel = 'Right';
+                    
+                    setMetrics({
+                        duration: durationStr,
+                        liftedLeg: legLabel,
+                        validPosture: isValid ? 'Yes' : 'No'
+                    });
                 }
             }
             frameId = requestAnimationFrame(update);
@@ -311,28 +314,35 @@ const LiveMetricsCard = ({ movementId, analyserRef, currentTimestampRef }: { mov
         return () => cancelAnimationFrame(frameId);
     }, [movementId, analyserRef, currentTimestampRef]);
 
-    if (metrics.length === 0) return null;
+    if (!metrics) return null;
 
     return (
-        <div className="sidebar-card shadow-1">
-            <div className="sidebar-card__header">
-                <span className="sidebar-card__title">Live Metrics</span>
+        <div className="sidebar-card shadow-1 live-metrics-card">
+            <div className="live-metrics-top">
+                <div className="live-metrics-duration-value">{metrics.duration}</div>
+                <div className="live-metrics-duration-label">Duration (Seconds)</div>
             </div>
-            <div className="sidebar-list">
-                {metrics.map((m, i) => {
-                    let valElement = <span className="live-metrics-value">{m.value}</span>;
-                    if (m.value === 'Yes') {
-                        valElement = <span className="live-metrics-badge live-metrics-badge--yes">{m.value}</span>;
-                    } else if (m.value === 'No') {
-                        valElement = <span className="live-metrics-badge live-metrics-badge--no">{m.value}</span>;
-                    }
-                    return (
-                        <div key={i} className="live-metrics-row">
-                            <span className="live-metrics-label">{m.label}</span>
-                            {valElement}
-                        </div>
-                    );
-                })}
+            <div className="live-metrics-bottom">
+                <div className="live-metrics-col">
+                    <div className="live-metrics-col-header">
+                        <span className="live-metrics-col-title">Leg Lifted</span>
+                    </div>
+                    <div className={`live-metrics-col-value live-metrics-mono ${metrics.liftedLeg === 'None' ? 'live-metrics-col-value--faint' : ''}`}>
+                        {metrics.liftedLeg || 'None'}
+                    </div>
+                </div>
+                <div className="live-metrics-col">
+                    <div className="live-metrics-col-header">
+                        <span className="live-metrics-col-title">Posture</span>
+                    </div>
+                    <div className="live-metrics-col-value">
+                        {metrics.validPosture === 'Yes' ? (
+                            <span className="live-metrics-badge live-metrics-badge--yes live-metrics-mono">{metrics.validPosture}</span>
+                        ) : (
+                            <span className="live-metrics-badge live-metrics-badge--no live-metrics-mono">{metrics.validPosture}</span>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
