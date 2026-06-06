@@ -1,0 +1,14 @@
+.replay-video-element {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 220px);
+    object-fit: contain; /* Prevents video distortion or cropping */
+    background-color: var(--colour-zinc-950, #09090b);
+}
+
+.replay-status {
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-400);
+    font-family: var(--font-mono, monospace);
+    text-align: center;
+}

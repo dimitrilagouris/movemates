@@ -1,0 +1,210 @@
+/* Core Layout - Relies on native document scroll */
+.settings-layout {
+    min-height: 100vh;
+    background-color: var(--colour-white);
+    color: var(--colour-zinc-900);
+}
+
+.settings-container {
+    /*max-width: 900px;*/
+    padding: var(--space-16) var(--space-32);
+}
+
+/* Header & Typography */
+.settings-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: var(--space-6);
+    letter-spacing: -0.02em;
+}
+
+/* Navigation Tabs */
+.settings-tabs {
+    display: flex;
+    gap: var(--space-6);
+    border-bottom: 1px solid var(--colour-zinc-200);
+    margin-bottom: var(--space-8);
+}
+
+.settings-tab {
+    background: none;
+    border: none;
+    padding: var(--space-3) 0;
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--colour-zinc-500);
+    cursor: pointer;
+    position: relative;
+}
+
+.settings-tab:hover {
+    color: var(--colour-zinc-900);
+}
+
+.settings-tab--active {
+    color: var(--colour-zinc-900);
+    font-weight: 600;
+}
+
+.settings-tab--active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--colour-zinc-900);
+}
+
+/* Alert Banner */
+.settings-banner {
+    display: flex;
+    align-items: center;
+    background-color: var(--colour-zinc-50);
+    border: 1px solid var(--colour-zinc-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.settings-banner__icon {
+    color: var(--colour-blue-600);
+    margin-right: var(--space-4);
+}
+
+.settings-banner__content {
+    flex: 1;
+}
+
+.settings-banner__content h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.settings-banner__content p {
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-500);
+}
+
+.settings-banner__actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* Sections & Rows */
+.settings-section {
+    margin-bottom: var(--space-12);
+}
+
+.settings-section__title {
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--colour-zinc-100);
+    margin-bottom: var(--space-2);
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--colour-zinc-100);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-row__info {
+    max-width: 60%;
+}
+
+.setting-row__info h4 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.setting-row__info p {
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-500);
+    line-height: 1.5;
+}
+
+/* Controls */
+.setting-row__control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 200px;
+}
+
+.setting-input {
+    width: 100%;
+    max-width: 280px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border: 1px solid var(--colour-zinc-300);
+    border-radius: var(--radius-md);
+    background-color: var(--colour-white);
+}
+
+.setting-input:focus {
+    outline: none;
+    border-color: var(--colour-zinc-900);
+    box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.1);
+}
+
+.w-24 { width: 96px; } /* Helper class for tight number inputs */
+
+/* Header Top Row */
+.settings-header__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Aligns buttons with the bottom of the H1 */
+    margin-bottom: var(--space-6);
+}
+
+.settings-header__top h1 {
+    margin-bottom: 0; /* Override previous margin */
+}
+
+.settings-global-actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* Footer Actions */
+.settings-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-8);
+    margin-top: var(--space-12);
+    border-top: 1px solid var(--colour-zinc-200);
+}
+
+.text-danger {
+    color: var(--colour-red-600);
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    padding: var(--space-2) var(--space-4);
+}
+
+.text-danger:hover {
+    background-color: var(--colour-red-50);
+    border-radius: var(--radius-md);
+}
+
+.inline-icon {
+    vertical-align: text-bottom;
+    margin-right: var(--space-2);
+}
+
+.hidden {
+    display: none;
+}
