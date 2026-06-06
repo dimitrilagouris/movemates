@@ -37,3 +37,21 @@ export interface BaseMovementTracker {
     landmark_series: LandmarksData[];
     armspan: number;
 }
+
+/** Specific metrics for the Underarm Throw movement. */
+export interface UnderarmThrowTracker extends BaseMovementTracker {
+    throwing_arm: 'left' | 'right';
+    isInFront: boolean;
+    isBehind: boolean;
+    prev_wrist_position: { x: number; y: number; z: number } | null;
+    velocity_buffer: number[];
+    velocity_buffer_size: number;
+    direction_state: 'backward' | 'forward' | 'neutral';
+    direction_confidence: number;
+    backward_swing_peak: { x: number; y: number; z: number } | null;
+    forward_swing_peak: { x: number; y: number; z: number } | null;
+    total_swing_angle: number;
+    is_underarm: boolean;
+    throw_valid: boolean;
+    validation_messages: string[];
+}

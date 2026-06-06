@@ -1,9 +1,10 @@
-import { UnderarmThrowAnalyser } from '../movements/UnderarmThrowAnalyser.ts'
-import type { MovementAnalyserFactory } from './MovementAnalyserFactory.ts'
-import type { MovementAnalyser } from '../../types/MovementAnalyser.ts'
+import { type MovementAnalyserFactory } from './MovementAnalyserFactory';
+import { UnderarmThrowAnalyser } from '../movements/UnderarmThrowAnalyser';
+import { type UnderarmThrowTracker } from '../../types/movements';
+import { type MovementAnalyser } from '../../types/MovementAnalyser';
 
 export class UnderarmThrowFactory implements MovementAnalyserFactory {
-    createAnalyser(): MovementAnalyser<any> {
+    createAnalyser(): MovementAnalyser<UnderarmThrowTracker> {
         return new UnderarmThrowAnalyser();
     }
 }

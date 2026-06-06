@@ -2,6 +2,7 @@ import React, {type RefObject } from 'react';
 import type {MovementId} from '../../types/movements';
 import {type MovementAnalyser } from '../../types/MovementAnalyser';
 import { OneLeggedStandMetrics } from './OneLeggedStandMetrics';
+import { UnderarmThrowMetrics } from './UnderarmThrowMetrics';
 import './style.css'; // import shared CSS for all live metrics cards
 
 export interface LiveMetricsProps {
@@ -14,6 +15,7 @@ type LiveMetricsComponent = React.FC<LiveMetricsProps>;
 
 const metricsRegistry: Partial<Record<MovementId, LiveMetricsComponent>> = {
     'one-legged-stand': OneLeggedStandMetrics,
+    'underarm-throw': UnderarmThrowMetrics,
     // Add future metrics components here
 };
 
