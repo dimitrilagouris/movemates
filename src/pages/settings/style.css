@@ -6,9 +6,8 @@
 }
 
 .settings-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: var(--space-8) var(--space-6);
+    /*max-width: 900px;*/
+    padding: var(--space-16) var(--space-32);
 }
 
 /* Header & Typography */
