@@ -7,11 +7,12 @@ import { DatabaseEngine, type AppSettings, DEFAULT_SETTINGS } from '../../engine
 import { LANDMARK_NAMES } from '../../types/landmarks';
 import { Button } from '../../components/common/Button';
 import { ToggleTabs } from '../../components/common/ToggleTabs';
+import { ScrubberBar } from '../../components/common/ScrubberBar'; // NEW: Imported the custom scrubber
 import './style.css';
 
 // --- Pure UI Components ---
 
-const SettingsTabs = ({ activeTab, onTabChange }: { activeTab: string, onTabChange: (tab: string) => void }): JSX.Element => (
+const SettingsTabs = ({ activeTab, onTabChange }: { activeTab: string, onTabChange: (tab: string) => void }) => (
     <nav className="settings-tabs">
         {['General', 'Filters', 'Movements'].map(tab => (
             <button
@@ -25,7 +26,7 @@ const SettingsTabs = ({ activeTab, onTabChange }: { activeTab: string, onTabChan
     </nav>
 );
 
-const SettingRow = ({ title, description, children }: { title: string, description: string, children: React.ReactNode }): JSX.Element => (
+const SettingRow = ({ title, description, children }: { title: string, description: string, children: React.ReactNode }) => (
     <div className="setting-row">
         <div className="setting-row__info">
             <h4>{title}</h4>
@@ -39,7 +40,7 @@ const SettingRow = ({ title, description, children }: { title: string, descripti
 
 // --- Section Components ---
 
-const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => (
     <div className="settings-section">
         <h3 className="settings-section__title">Profile Overview</h3>
 
@@ -55,7 +56,7 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
     </div>
 );
 
-const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => (
     <div className="settings-section">
         <h3 className="settings-section__title">Basics</h3>
 
@@ -80,7 +81,7 @@ const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChang
     </div>
 );
 
-const AlgorithmSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => {
+const AlgorithmSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => {
     if (settings.filterType !== 'OneEuro') return <></>;
 
     return (
@@ -102,10 +103,9 @@ const AlgorithmSection = ({ settings, onChange }: { settings: AppSettings, onCha
     );
 };
 
-const ThrowSettingsPanel = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: any) => void }): JSX.Element => {
+const ThrowSettingsPanel = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: any) => void }) => {
     const min = 45;
     const max = 180;
-    const percent = ((settings.swingAngle - min) / (max - min)) * 100;
 
     return (
         <div className="settings-section">
@@ -124,13 +124,12 @@ const ThrowSettingsPanel = ({ settings, onChange }: { settings: AppSettings, onC
 
             <SettingRow title="Swing Angle Threshold" description="Degrees required to register a valid forward throw motion.">
                 <div className="swing-slider-container">
-                    <input
-                        type="range"
-                        className="swing-slider"
-                        min={min} max={max}
+                    {/* Replaced native range input with ScrubberBar component */}
+                    <ScrubberBar
+                        min={min}
+                        max={max}
                         value={settings.swingAngle}
-                        onChange={(e) => onChange('swingAngle', Number(e.target.value))}
-                        style={{ background: `linear-gradient(to right, var(--colour-zinc-800) 0%, var(--colour-zinc-800) ${percent}%, var(--colour-zinc-200) ${percent}%, var(--colour-zinc-200) 100%)` }}
+                        onChange={(value) => onChange('swingAngle', value)}
                     />
                     <span className="swing-slider__value">{settings.swingAngle}°</span>
                 </div>
@@ -149,7 +148,7 @@ const LocalGridPanel = ({
     toggleSelection: (id: string) => void,
     selectAll: () => void,
     deselectAll: () => void
-}): JSX.Element => {
+}) => {
     const handleRowSelect = (landmark: string) => {
         ['x', 'y', 'z'].forEach(axis => toggleSelection(`${landmark}_${axis}`));
     };
@@ -206,11 +205,11 @@ const LocalGridPanel = ({
 
 // --- Main Page Component ---
 
-export const SettingsPage = (): JSX.Element => {
+export const SettingsPage = () => {
     const [settings, setSettings] = useState<AppSettings | null>(null);
     const [originalSettings, setOriginalSettings] = useState<AppSettings | null>(null);
     const [selectedLandmarks, setSelectedLandmarks] = useState<Set<string>>(new Set());
-    const [activeTab, setActiveTab] = useState<string>('General'); // Default to General now
+    const [activeTab, setActiveTab] = useState<string>('General');
 
     const dbRef = useRef(new DatabaseEngine());
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -313,10 +312,10 @@ export const SettingsPage = (): JSX.Element => {
                     <div className="settings-header__top">
                         <h1>Settings</h1>
                         <div className="settings-global-actions">
-                            <Button variant="secondary" onClick={exportJSON}>
+                            <Button variant="secondary" size="small" onClick={exportJSON}>
                                 <RiDownloadLine className="inline-icon" /> Export
                             </Button>
-                            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                            <Button variant="secondary" size="small" onClick={() => fileInputRef.current?.click()}>
                                 <RiUploadLine className="inline-icon" /> Import
                             </Button>
                             <input type="file" className="hidden" accept=".json" ref={fileInputRef} onChange={importJSON} />
