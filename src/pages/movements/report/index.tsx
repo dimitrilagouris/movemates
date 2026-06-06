@@ -72,9 +72,12 @@ export const ReportPage = () => {
             <header className="learn-page__header report-header">
                 <div className="learn-page__header-left">
                     <h1 className="learn-title">
-                        <RiFileChartLine className="mr-2 inline-block" /> 
                         Assessment Report
                     </h1>
+                </div>
+                <div className="report-header__actions" style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                    <Button variant="text" onClick={() => {}}>Share</Button>
+                    <Button variant="primary" className="shadow-1" onClick={() => {}}>Save</Button>
                 </div>
             </header>
 

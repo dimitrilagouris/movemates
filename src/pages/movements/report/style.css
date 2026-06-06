@@ -153,9 +153,9 @@
 }
 
 .stat-card__value {
-    font-size: 2rem;
+    font-size: 24px;
     color: var(--colour-zinc-900, #18181b);
-    font-weight: 700;
+    font-weight: 600;
     font-family: var(--font-sans, sans-serif);
     line-height: 1.2;
     margin-top: var(--space-2);
@@ -209,7 +209,7 @@
 
 .chart-stat-val {
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
     font-family: var(--font-mono);
 }
@@ -224,7 +224,7 @@
     display: inline-flex;
     align-items: center;
     padding: 2px 6px;
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
