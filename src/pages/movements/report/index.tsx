@@ -222,9 +222,9 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rShoulder}°</div>
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rShoulder}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -238,7 +238,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
                             <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lShoulderAbd" name="Left Shoulder" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
-                            <Line type="monotone" dataKey="rShoulderAbd" name="Right Shoulder" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rShoulderAbd" name="Right Shoulder" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -257,9 +257,9 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rHip}°</div>
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rHip}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -273,7 +273,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
                             <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lHipAbd" name="Left Hip" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
-                            <Line type="monotone" dataKey="rHipAbd" name="Right Hip" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rHipAbd" name="Right Hip" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -292,9 +292,9 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-yellow-600)' }}>{maxVals?.rKnee}°</div>
+                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rKnee}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-yellow-600)', backgroundColor: 'var(--colour-yellow-100)' }}>Right</div>
+                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -308,7 +308,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
                             <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lKneeValgus" name="Left Knee" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
-                            <Line type="monotone" dataKey="rKneeValgus" name="Right Knee" stroke="var(--colour-yellow-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-yellow-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-yellow-500) 40%, transparent))' }} />
+                            <Line type="monotone" dataKey="rKneeValgus" name="Right Knee" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
