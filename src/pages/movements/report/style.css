@@ -126,7 +126,7 @@
 .stat-card__main {
     background-color: var(--colour-white);
     border-radius: var(--radius-lg);
-    padding: var(--space-4);
+    padding: var(--space-3);
 }
 
 .stat-card__header {
