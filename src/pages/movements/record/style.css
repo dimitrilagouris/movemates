@@ -81,3 +81,52 @@
     50% { opacity: 0.4; }
     100% { opacity: 1; }
 }
+
+/* Live Metrics Card */
+.live-metrics-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--colour-zinc-100);
+}
+
+.live-metrics-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.live-metrics-row:first-child {
+    padding-top: 0;
+}
+
+.live-metrics-label {
+    font-weight: 400;
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-700);
+}
+
+.live-metrics-value {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-900);
+}
+
+.live-metrics-badge {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.live-metrics-badge--yes {
+    background-color: var(--colour-lime-100);
+    color: var(--colour-lime-600);
+}
+
+.live-metrics-badge--no {
+    background-color: var(--colour-red-100);
+    color: var(--colour-red-600);
+}

@@ -104,6 +104,7 @@ const useMovementSession = (
 
     const detectorRef = useRef(new MediaPipeDetector());
     const analyserRef = useRef<MovementAnalyser<any> | null>(null);
+    const currentTimestampRef = useRef<number>(0);
 
     useEffect(() => {
         if (movementId) {
@@ -143,6 +144,7 @@ const useMovementSession = (
 
                 // mediaTime is the frame's actual capture timestamp in seconds
                 const timestamp = metadata.mediaTime * 1000;
+                currentTimestampRef.current = timestamp;
                 const landmarksData = detector.detect(video, timestamp);
 
                 if (landmarksData?.landmarks[0]) {
@@ -181,7 +183,7 @@ const useMovementSession = (
         };
     }, [movementId, videoRef, canvasRef]);
 
-    return { progress, message, analyserRef, isAttemptFinished };
+    return { progress, message, analyserRef, isAttemptFinished, currentTimestampRef };
 };
 
 /**
@@ -272,6 +274,70 @@ const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Ele
     </div>
 );
 
+const LiveMetricsCard = ({ movementId, analyserRef, currentTimestampRef }: { movementId: MovementId | undefined, analyserRef: RefObject<MovementAnalyser<any> | null>, currentTimestampRef: RefObject<number> }): JSX.Element | null => {
+    const [metrics, setMetrics] = useState<{label: string, value: string}[]>([]);
+
+    useEffect(() => {
+        let frameId: number;
+        
+        const update = () => {
+            if (analyserRef.current) {
+                const tracker = analyserRef.current.getTrackerState();
+                const isValid = analyserRef.current.isPoseValid();
+                
+                if (movementId === 'one-legged-stand') {
+                    const olsTracker = tracker as any;
+                    
+                    let durationStr = '0.0s';
+                    if (olsTracker.attempt_finished) {
+                        durationStr = (olsTracker.duration || 0).toFixed(1) + 's';
+                    } else if (olsTracker.start_time !== null) {
+                        const currentSecs = currentTimestampRef.current / 1000;
+                        durationStr = Math.max(0, currentSecs - olsTracker.start_time).toFixed(1) + 's';
+                    }
+                    
+                    setMetrics([
+                        { label: 'Standing on one leg', value: olsTracker.is_standing ? 'Yes' : 'No' },
+                        { label: 'Lifted Leg', value: olsTracker.lifted_leg ? (olsTracker.lifted_leg === 'left' ? 'Left' : 'Right') : '-' },
+                        { label: 'Duration', value: durationStr },
+                        { label: 'Valid Posture', value: isValid ? 'Yes' : 'No' }
+                    ]);
+                }
+            }
+            frameId = requestAnimationFrame(update);
+        };
+        
+        frameId = requestAnimationFrame(update);
+        return () => cancelAnimationFrame(frameId);
+    }, [movementId, analyserRef, currentTimestampRef]);
+
+    if (metrics.length === 0) return null;
+
+    return (
+        <div className="sidebar-card shadow-1">
+            <div className="sidebar-card__header">
+                <span className="sidebar-card__title">Live Metrics</span>
+            </div>
+            <div className="sidebar-list">
+                {metrics.map((m, i) => {
+                    let valElement = <span className="live-metrics-value">{m.value}</span>;
+                    if (m.value === 'Yes') {
+                        valElement = <span className="live-metrics-badge live-metrics-badge--yes">{m.value}</span>;
+                    } else if (m.value === 'No') {
+                        valElement = <span className="live-metrics-badge live-metrics-badge--no">{m.value}</span>;
+                    }
+                    return (
+                        <div key={i} className="live-metrics-row">
+                            <span className="live-metrics-label">{m.label}</span>
+                            {valElement}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
 export const RecordPage = () => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
@@ -282,7 +348,7 @@ export const RecordPage = () => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const hasAutoStarted = useRef<boolean>(false);
 
-    const { progress, message, analyserRef, isAttemptFinished } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+    const { progress, message, analyserRef, isAttemptFinished, currentTimestampRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
     // Initialise recorder and wire the stop event to trigger navigation
     const handleSavedAndNavigate = useCallback(() => {
@@ -357,6 +423,7 @@ export const RecordPage = () => {
 
                 <aside className="learn-sidebar shadow-1">
                     <CalibrationCard progress={progress} message={message} />
+                    <LiveMetricsCard movementId={movementId} analyserRef={analyserRef} currentTimestampRef={currentTimestampRef} />
                     <InstructionsCard instructions={movement.instructions} />
                 </aside>
             </main>
