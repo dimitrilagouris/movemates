@@ -1,7 +1,7 @@
 import type { CalibrationUIState, MovementAnalyser } from '../../types/MovementAnalyser';
 import type { LandmarksData, Landmark } from '../../types/landmarks';
 import type { CalibrationTracker } from '../../types/movements';
-import { UnderarmThrowTracker } from '../../types/movements';
+import type { UnderarmThrowTracker } from '../../types/movements';
 
 // --- Pure Helper Functions ---
 

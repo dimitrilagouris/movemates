@@ -304,8 +304,7 @@ export const RecordPage = () => {
 
     // Auto-start recording when calibration completes
     useEffect(() => {
-        // We scope this strictly to the one-legged stand as requested
-        if (movementId === 'one-legged-stand' && progress === 100 && !isRecording && !hasAutoStarted.current) {
+        if ((movementId === 'one-legged-stand' || movementId === 'underarm-throw') && progress === 100 && !isRecording && !hasAutoStarted.current) {
             hasAutoStarted.current = true;
             start();
         }
@@ -313,7 +312,7 @@ export const RecordPage = () => {
 
     // Auto-stop recording when the attempt finishes
     useEffect(() => {
-        if (movementId == 'one-legged-stand' && isAttemptFinished && isRecording) {
+        if ((movementId === 'one-legged-stand' || movementId === 'underarm-throw') && isAttemptFinished && isRecording) {
             stop();
         }
     }, [isAttemptFinished, movementId, isRecording, stop]);

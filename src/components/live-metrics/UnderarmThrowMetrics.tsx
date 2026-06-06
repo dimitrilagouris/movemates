@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { LiveMetricsProps } from './LiveMetricsRegistry';
-import { UnderarmThrowTracker } from '../../types/movements';
+import type { UnderarmThrowTracker } from '../../types/movements';
 
 export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, currentTimestampRef }) => {
     const [metrics, setMetrics] = useState<{
