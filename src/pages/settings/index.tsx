@@ -1,127 +1,104 @@
 import { useState, useEffect, type ChangeEvent, useRef } from 'react';
 import {
-    RiSettings3Line, RiDownloadLine, RiUploadLine,
-    RiSaveLine, RiMagicLine, RiRestartLine
+    RiErrorWarningLine, RiSaveLine, RiDownloadLine,
+    RiUploadLine, RiRestartLine, RiMagicLine
 } from "react-icons/ri";
 import { DatabaseEngine, type AppSettings, DEFAULT_SETTINGS } from '../../engine/db/DatabaseEngine';
 import { LANDMARK_NAMES } from '../../types/landmarks';
+import { Button } from '../../components/common/Button';
+import { ToggleTabs } from '../../components/common/ToggleTabs';
 import './style.css';
 
-// --- Sub-components ---
+// --- Pure UI Components ---
 
-const FilterConfigurationPanel = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: any) => void }): JSX.Element => {
-    const handleArrayChange = (e: ChangeEvent<HTMLInputElement>, key: keyof AppSettings) => {
-        const values = e.target.value.split(',').map(v => parseFloat(v.trim()) || 0);
-        onChange(key, values);
-    };
+const SettingsTabs = ({ activeTab, onTabChange }: { activeTab: string, onTabChange: (tab: string) => void }): JSX.Element => (
+    <nav className="settings-tabs">
+        {['General', 'Filters', 'Movements'].map(tab => (
+            <button
+                key={tab}
+                className={`settings-tab ${activeTab === tab ? 'settings-tab--active' : ''}`}
+                onClick={() => onTabChange(tab)}
+            >
+                {tab}
+            </button>
+        ))}
+    </nav>
+);
+
+const SettingRow = ({ title, description, children }: { title: string, description: string, children: React.ReactNode }): JSX.Element => (
+    <div className="setting-row">
+        <div className="setting-row__info">
+            <h4>{title}</h4>
+            <p>{description}</p>
+        </div>
+        <div className="setting-row__control">
+            {children}
+        </div>
+    </div>
+);
+
+// --- Section Components ---
+
+const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+    <div className="settings-section">
+        <h3 className="settings-section__title">Profile Overview</h3>
+
+        <SettingRow title="Display Name" description="Your name will be displayed on the sidebar and used in your generated assessment reports.">
+            <input
+                type="text"
+                className="setting-input"
+                placeholder="e.g. John Doe"
+                value={settings.userName || ''}
+                onChange={(e) => onChange('userName', e.target.value)}
+            />
+        </SettingRow>
+    </div>
+);
+
+const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+    <div className="settings-section">
+        <h3 className="settings-section__title">Basics</h3>
+
+        <SettingRow title="Filter Method" description="Apply globally or target specific anatomical joints.">
+            <select className="setting-input" value={settings.filterMethod} onChange={(e) => onChange('filterMethod', e.target.value)}>
+                <option value="global">Global Filtering</option>
+                <option value="local">Local Overrides</option>
+            </select>
+        </SettingRow>
+
+        <SettingRow title="Algorithm Type" description="The core mathematical approach used to eliminate coordinate jitter.">
+            <select className="setting-input" value={settings.filterType} onChange={(e) => onChange('filterType', e.target.value)}>
+                <option value="OneEuro">OneEuro (Adaptive)</option>
+                <option value="IIR">IIR (Feedback)</option>
+                <option value="Freqz">Freqz (FIR Mask)</option>
+            </select>
+        </SettingRow>
+
+        <SettingRow title="Sample Rate (Hz)" description="Assumed camera capture rate for velocity calculations.">
+            <input type="number" className="setting-input w-24" value={settings.sampleRate} onChange={(e) => onChange('sampleRate', Number(e.target.value))} />
+        </SettingRow>
+    </div>
+);
+
+const AlgorithmSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => {
+    if (settings.filterType !== 'OneEuro') return <></>;
 
     return (
-        <section className="settings-section">
-            <div className="settings-section__header">
-                <h2>Filter Configuration</h2>
-                <p>Adjust the mathematical smoothing applied to the raw skeletal tracking data.</p>
-            </div>
+        <div className="settings-section">
+            <h3 className="settings-section__title">1-Euro Parameters</h3>
 
-            <div className="settings-group">
-                <div className="setting-item">
-                    <div className="setting-item__info">
-                        <label>Filter Method</label>
-                        <p><strong>Global:</strong> Apply the same algorithm to all joints. <strong>Local:</strong> Target specific joints.</p>
-                    </div>
-                    <select className="setting-input" value={settings.filterMethod} onChange={(e) => onChange('filterMethod', e.target.value)}>
-                        <option value="global">Global</option>
-                        <option value="local">Local</option>
-                    </select>
-                </div>
+            <SettingRow title="Min Cutoff Frequency" description="Lower values increase smoothing but introduce motion lag.">
+                <input type="number" className="setting-input w-24" step="0.1" value={settings.mincutoff} onChange={(e) => onChange('mincutoff', Number(e.target.value))} />
+            </SettingRow>
 
-                <div className="setting-item">
-                    <div className="setting-item__info">
-                        <label>Filter Algorithm</label>
-                        <p>The core mathematical approach used to eliminate coordinate jitter.</p>
-                    </div>
-                    <select className="setting-input" value={settings.filterType} onChange={(e) => onChange('filterType', e.target.value)}>
-                        <option value="OneEuro">1-Euro (Adaptive Smoothing)</option>
-                        <option value="IIR">IIR (Feedforward / Feedback)</option>
-                        <option value="Freqz">Freqz (FIR Mask)</option>
-                    </select>
-                </div>
+            <SettingRow title="Speed Coefficient (Beta)" description="Higher values force faster snapping to sudden movements.">
+                <input type="number" className="setting-input w-24" step="0.0001" value={settings.beta_} onChange={(e) => onChange('beta_', Number(e.target.value))} />
+            </SettingRow>
 
-                <div className="setting-item">
-                    <div className="setting-item__info">
-                        <label>Sample Rate (Hz)</label>
-                        <p>The assumed camera capture rate used for velocity calculations.</p>
-                    </div>
-                    <input type="number" className="setting-input" value={settings.sampleRate} onChange={(e) => onChange('sampleRate', Number(e.target.value))} />
-                </div>
-
-                {/* Flattened Conditional Parameters for OneEuro */}
-                {settings.filterType === 'OneEuro' && (
-                    <>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>Min Cutoff Frequency</label>
-                                <p>Lower values increase smoothing but introduce more lag during slow movements.</p>
-                            </div>
-                            <input type="number" className="setting-input" step="0.1" value={settings.mincutoff} onChange={(e) => onChange('mincutoff', Number(e.target.value))} />
-                        </div>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>Beta (Speed Coefficient)</label>
-                                <p>Higher values force the skeleton to snap faster to sudden, rapid movements.</p>
-                            </div>
-                            <input type="number" className="setting-input" step="0.0001" value={settings.beta_} onChange={(e) => onChange('beta_', Number(e.target.value))} />
-                        </div>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>Derivative Cutoff</label>
-                                <p>Controls the strictness of the internal speed estimation.</p>
-                            </div>
-                            <input type="number" className="setting-input" step="0.1" value={settings.dcutoff} onChange={(e) => onChange('dcutoff', Number(e.target.value))} />
-                        </div>
-                    </>
-                )}
-
-                {/* Flattened Conditional Parameters for IIR */}
-                {settings.filterType === 'IIR' && (
-                    <>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>IIR B Coefficients</label>
-                                <p>Feedforward coefficients (comma-separated).</p>
-                            </div>
-                            <input type="text" className="setting-input" value={settings.IIRB.join(', ')} onChange={(e) => handleArrayChange(e, 'IIRB')} />
-                        </div>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>IIR A Coefficients</label>
-                                <p>Feedback coefficients (comma-separated).</p>
-                            </div>
-                            <input type="text" className="setting-input" value={settings.IIRA.join(', ')} onChange={(e) => handleArrayChange(e, 'IIRA')} />
-                        </div>
-                    </>
-                )}
-
-                {/* Flattened Conditional Parameters for Freqz */}
-                {settings.filterType === 'Freqz' && (
-                    <>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>FFT Granularity</label>
-                                <p>Must be a power of 2 (e.g., 128, 256, 512).</p>
-                            </div>
-                            <input type="number" className="setting-input" value={settings.fftGranularity} onChange={(e) => onChange('fftGranularity', Number(e.target.value))} />
-                        </div>
-                        <div className="setting-item">
-                            <div className="setting-item__info">
-                                <label>Frequency Response</label>
-                                <p>Real/imaginary sequence pairs (comma-separated).</p>
-                            </div>
-                            <input type="text" className="setting-input" value={settings.freqResponse.join(', ')} onChange={(e) => handleArrayChange(e, 'freqResponse')} />
-                        </div>
-                    </>
-                )}
-            </div>
-        </section>
+            <SettingRow title="Derivative Cutoff" description="Strictness of internal speed estimation.">
+                <input type="number" className="setting-input w-24" step="0.1" value={settings.dcutoff} onChange={(e) => onChange('dcutoff', Number(e.target.value))} />
+            </SettingRow>
+        </div>
     );
 };
 
@@ -131,49 +108,34 @@ const ThrowSettingsPanel = ({ settings, onChange }: { settings: AppSettings, onC
     const percent = ((settings.swingAngle - min) / (max - min)) * 100;
 
     return (
-        <section className="settings-section">
-            <div className="settings-section__header">
-                <h2>Underarm Throw Logic</h2>
-                <p>Specific thresholds and targets for the underarm throw evaluation engine.</p>
-            </div>
+        <div className="settings-section">
+            <h3 className="settings-section__title">Underarm Throw Logic</h3>
 
-            <div className="settings-group">
-                <div className="setting-item">
-                    <div className="setting-item__info">
-                        <label>Target Throwing Arm</label>
-                        <p>Select which arm the engine should monitor for the release angle.</p>
-                    </div>
-                    <div className="arm-toggle-group">
-                        <button
-                            className={`btn ${settings.throwingArm === 'Left' ? 'btn-primary' : 'btn-secondary'}`}
-                            onClick={() => onChange('throwingArm', 'Left')}
-                        >Left</button>
-                        <button
-                            className={`btn ${settings.throwingArm === 'Right' ? 'btn-primary' : 'btn-secondary'}`}
-                            onClick={() => onChange('throwingArm', 'Right')}
-                        >Right</button>
-                    </div>
-                </div>
+            <SettingRow title="Target Throwing Arm" description="Select which arm the engine should monitor for the release angle.">
+                <ToggleTabs
+                    activeId={settings.throwingArm}
+                    onChange={(id) => onChange('throwingArm', id)}
+                    options={[
+                        { id: 'Left', label: 'Left Arm' },
+                        { id: 'Right', label: 'Right Arm' }
+                    ]}
+                />
+            </SettingRow>
 
-                <div className="setting-item">
-                    <div className="setting-item__info">
-                        <label>Swing Angle Threshold</label>
-                        <p>Degrees required to register a valid forward throw motion.</p>
-                    </div>
-                    <div className="swing-slider-container">
-                        <input
-                            type="range"
-                            className="swing-slider"
-                            min={min} max={max}
-                            value={settings.swingAngle}
-                            onChange={(e) => onChange('swingAngle', Number(e.target.value))}
-                            style={{ background: `linear-gradient(to right, var(--colour-zinc-800) 0%, var(--colour-zinc-800) ${percent}%, var(--colour-zinc-200) ${percent}%, var(--colour-zinc-200) 100%)` }}
-                        />
-                        <span className="swing-slider__value">{settings.swingAngle}°</span>
-                    </div>
+            <SettingRow title="Swing Angle Threshold" description="Degrees required to register a valid forward throw motion.">
+                <div className="swing-slider-container">
+                    <input
+                        type="range"
+                        className="swing-slider"
+                        min={min} max={max}
+                        value={settings.swingAngle}
+                        onChange={(e) => onChange('swingAngle', Number(e.target.value))}
+                        style={{ background: `linear-gradient(to right, var(--colour-zinc-800) 0%, var(--colour-zinc-800) ${percent}%, var(--colour-zinc-200) ${percent}%, var(--colour-zinc-200) 100%)` }}
+                    />
+                    <span className="swing-slider__value">{settings.swingAngle}°</span>
                 </div>
-            </div>
-        </section>
+            </SettingRow>
+        </div>
     );
 };
 
@@ -193,15 +155,12 @@ const LocalGridPanel = ({
     };
 
     return (
-        <section className="settings-section">
-            <div className="settings-section__header">
-                <h2>Local Filter Targeting</h2>
-                <p>Select specific coordinates to override with the current filter settings above.</p>
-            </div>
+        <div className="settings-section">
+            <h3 className="settings-section__title">Local Filter Targeting</h3>
 
             <div className="grid-controls">
-                <button className="btn btn-secondary btn-sm" onClick={selectAll}>Select All</button>
-                <button className="btn btn-secondary btn-sm" onClick={deselectAll}>Deselect All</button>
+                <Button variant="secondary" size="small" onClick={selectAll}>Select All</Button>
+                <Button variant="secondary" size="small" onClick={deselectAll}>Deselect All</Button>
                 <span className="selection-info-text">{selected.size} active targets</span>
             </div>
 
@@ -234,14 +193,14 @@ const LocalGridPanel = ({
                                 );
                             })}
                             <td>
-                                <button className="btn-text text-sm" onClick={() => handleRowSelect(name)}>All</button>
+                                <Button variant="text" size="small" onClick={() => handleRowSelect(name)}>All</Button>
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
     );
 };
 
@@ -249,26 +208,37 @@ const LocalGridPanel = ({
 
 export const SettingsPage = (): JSX.Element => {
     const [settings, setSettings] = useState<AppSettings | null>(null);
+    const [originalSettings, setOriginalSettings] = useState<AppSettings | null>(null);
     const [selectedLandmarks, setSelectedLandmarks] = useState<Set<string>>(new Set());
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [activeTab, setActiveTab] = useState<string>('General'); // Default to General now
+
     const dbRef = useRef(new DatabaseEngine());
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const initialiseSettings = async (): Promise<void> => {
+        const data = await dbRef.current.loadSettings();
+        setSettings(data);
+        setOriginalSettings(JSON.parse(JSON.stringify(data)));
+    };
 
     useEffect(() => {
-        const init = async () => setSettings(await dbRef.current.loadSettings());
-        init();
+        initialiseSettings();
     }, []);
 
-    const updateSetting = (key: keyof AppSettings, value: any): void => {
+    const updateSetting = (key: keyof AppSettings, value: unknown): void => {
         if (settings) setSettings({ ...settings, [key]: value });
     };
 
     const handleSave = async (): Promise<void> => {
-        if (settings) await dbRef.current.saveSettings(settings);
+        if (!settings) return;
+        await dbRef.current.saveSettings(settings);
+        setOriginalSettings(JSON.parse(JSON.stringify(settings)));
     };
 
     const handleReset = async (): Promise<void> => {
         setSettings(DEFAULT_SETTINGS);
         await dbRef.current.saveSettings(DEFAULT_SETTINGS);
+        setOriginalSettings(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)));
     };
 
     const handleApplyLocal = (): void => {
@@ -310,7 +280,8 @@ export const SettingsPage = (): JSX.Element => {
         reader.onload = (event) => {
             try {
                 const imported = JSON.parse(event.target?.result as string);
-                setSettings({ ...DEFAULT_SETTINGS, ...imported });
+                const merged = { ...DEFAULT_SETTINGS, ...imported };
+                setSettings(merged);
             } catch (err) {
                 console.error("Failed to parse settings JSON");
             }
@@ -330,64 +301,90 @@ export const SettingsPage = (): JSX.Element => {
         setSelectedLandmarks(all);
     };
 
-    if (!settings) return <div className="p-8 text-zinc-500">Loading configurations...</div>;
+    if (!settings) return <div className="settings-layout">Loading...</div>;
+
+    const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(originalSettings);
 
     return (
-        <div className="learn-page relative h-full flex flex-col bg-zinc-50">
-            <header className="learn-page__header shrink-0 bg-white shadow-sm z-10">
-                <div className="learn-page__header-left">
-                    <h1 className="learn-title">Preferences</h1>
-                </div>
-                <div className="learn-page__header-right">
-                    <button className="btn btn-secondary btn-sm" onClick={exportJSON}>
-                        <RiDownloadLine /> Export JSON
-                    </button>
-                    <button className="btn btn-secondary btn-sm" onClick={() => fileInputRef.current?.click()}>
-                        <RiUploadLine /> Import JSON
-                    </button>
-                    {/*<input type="file" className="hidden" accept=".json" ref={fileInputRef} onChange={importJSON} />*/}
-                </div>
-            </header>
+        <div className="settings-layout">
+            <div className="settings-container">
 
-            <main className="settings-scroll-container">
-                <div className="settings-content-wrapper">
-                    <FilterConfigurationPanel settings={settings} onChange={updateSetting} />
-                    <hr className="settings-divider" />
+                <header className="settings-header">
+                    <div className="settings-header__top">
+                        <h1>Settings</h1>
+                        <div className="settings-global-actions">
+                            <Button variant="secondary" onClick={exportJSON}>
+                                <RiDownloadLine className="inline-icon" /> Export
+                            </Button>
+                            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                                <RiUploadLine className="inline-icon" /> Import
+                            </Button>
+                            <input type="file" className="hidden" accept=".json" ref={fileInputRef} onChange={importJSON} />
+                        </div>
+                    </div>
+                    <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                </header>
 
-                    {settings.filterMethod === 'local' && (
+                <main className="settings-content">
+                    {hasUnsavedChanges && (
+                        <div className="settings-banner">
+                            <div className="settings-banner__icon"><RiErrorWarningLine size={24} /></div>
+                            <div className="settings-banner__content">
+                                <h3>Unsaved Changes</h3>
+                                <p>You have modified your configuration. Remember to save below.</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* General Tab */}
+                    {activeTab === 'General' && (
+                        <GeneralSection settings={settings} onChange={updateSetting} />
+                    )}
+
+                    {/* Filters Tab */}
+                    {activeTab === 'Filters' && (
                         <>
-                            <LocalGridPanel
-                                selected={selectedLandmarks}
-                                toggleSelection={toggleLandmark}
-                                selectAll={selectAllLandmarks}
-                                deselectAll={() => setSelectedLandmarks(new Set())}
-                            />
-                            <hr className="settings-divider" />
+                            <FiltersSection settings={settings} onChange={updateSetting} />
+                            <AlgorithmSection settings={settings} onChange={updateSetting} />
+                            {settings.filterMethod === 'local' && (
+                                <LocalGridPanel
+                                    selected={selectedLandmarks}
+                                    toggleSelection={toggleLandmark}
+                                    selectAll={selectAllLandmarks}
+                                    deselectAll={() => setSelectedLandmarks(new Set())}
+                                />
+                            )}
                         </>
                     )}
 
-                    <ThrowSettingsPanel settings={settings} onChange={updateSetting} />
-                </div>
-            </main>
+                    {/* Movements Tab */}
+                    {activeTab === 'Movements' && (
+                        <ThrowSettingsPanel settings={settings} onChange={updateSetting} />
+                    )}
 
-            {/* Sticky Action Bar at the bottom */}
-            <div className="settings-action-bar">
-                <div className="settings-action-bar__content">
-                    <button className="btn btn-danger btn-outline" onClick={handleReset}>
-                        <RiRestartLine /> Reset Defaults
-                    </button>
+                    <div className="settings-footer">
+                        <Button variant="text" className="text-danger" onClick={handleReset}>
+                            <RiRestartLine className="inline-icon" /> Reset to Defaults
+                        </Button>
 
-                    <div className="settings-action-bar__right">
-                        {settings.filterMethod === 'local' && selectedLandmarks.size > 0 && (
-                            <button className="btn btn-secondary shadow-1" onClick={handleApplyLocal}>
-                                <RiMagicLine /> Apply to {selectedLandmarks.size} Selected
-                            </button>
-                        )}
-                        <button className="btn btn-primary shadow-1" onClick={handleSave}>
-                            <RiSaveLine /> Save Changes
-                        </button>
+                        <div className="settings-action-bar__right">
+                            {settings.filterMethod === 'local' && selectedLandmarks.size > 0 && activeTab === 'Filters' && (
+                                <Button variant="secondary" onClick={handleApplyLocal}>
+                                    <RiMagicLine className="inline-icon" /> Apply to {selectedLandmarks.size} Selected
+                                </Button>
+                            )}
+                            <Button
+                                variant="primary"
+                                onClick={handleSave}
+                                disabled={!hasUnsavedChanges}
+                                style={{ opacity: hasUnsavedChanges ? 1 : 0.5 }}
+                            >
+                                <RiSaveLine className="inline-icon" />
+                                {hasUnsavedChanges ? "Save Changes" : "Saved"}
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                </main>
             </div>
         </div>
     );

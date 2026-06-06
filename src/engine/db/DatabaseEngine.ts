@@ -14,6 +14,7 @@ export interface LandmarkFrame {
 }
 
 export interface AppSettings {
+    userName: string;
     filterMethod: 'global' | 'local';
     localFilters: Record<string, unknown>;
     filterType: 'OneEuro' | 'IIR' | 'Freqz';
