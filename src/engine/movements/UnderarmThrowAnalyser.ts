@@ -204,6 +204,8 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
             is_underarm: true,
             throw_valid: true,
             validation_messages: [],
+            has_started_forward_swing: false,
+            completion_timestamp: null,
             armspan: 0,
             start_time: null,
             end_time: null,
@@ -225,10 +227,17 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
     }
 
     public setRecordingState(isRecording: boolean): void {
+        if (!isRecording && this.calibration?.curr_state === 2) {
+            this.activeState = new RecordingState(this);
+            return;
+        }
         this.activeState = isRecording ? new RecordingState(this) : new CalibratingState(this);
     }
 
     public processFrame(landmarksData: LandmarksData, timestamp: number): void {
+        if (this.calibration?.curr_state === 2 && this.activeState instanceof CalibratingState) {
+            this.activeState = new RecordingState(this);
+        }
         this.activeState.processFrame(landmarksData, timestamp);
     }
 
@@ -302,10 +311,14 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
             this.trackSwingMotion(landmarksData, frameIndex, timestampS);
 
             if (this.tracker.total_swing_angle > 100) {
-                this.tracker.attempt_finished = true;
-                if (this.tracker.start_time !== null) {
-                    this.tracker.end_time = timestampS;
-                    this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100000) / 100;
+                if (this.tracker.completion_timestamp === null) {
+                    this.tracker.completion_timestamp = timestampS;
+                    if (this.tracker.start_time !== null) {
+                        this.tracker.end_time = timestampS;
+                        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100000) / 100;
+                    }
+                } else if (timestampS - this.tracker.completion_timestamp >= 0.5) {
+                    this.tracker.attempt_finished = true;
                 }
             }
         }
@@ -431,6 +444,9 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
         }
 
         if (this.tracker.direction_state === 'forward') {
+            if (this.tracker.backward_swing_peak !== null) {
+                this.tracker.has_started_forward_swing = true;
+            }
             if (!this.tracker.forward_swing_peak || wrist.y < this.tracker.forward_swing_peak.y) {
                 this.tracker.forward_swing_peak = { x: wrist.x, y: wrist.y, z: wrist.z };
             }

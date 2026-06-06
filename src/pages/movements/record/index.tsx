@@ -102,6 +102,7 @@ const useMovementSession = (
     const [progress, setProgress] = useState<number>(0);
     const [message, setMessage] = useState<string>("Loading AR tracking engine...");
     const [isAttemptFinished, setIsAttemptFinished] = useState<boolean>(false);
+    const [isAttemptStarted, setIsAttemptStarted] = useState<boolean>(false);
 
     const detectorRef = useRef(new MediaPipeDetector());
     const analyserRef = useRef<MovementAnalyser<any> | null>(null);
@@ -156,8 +157,13 @@ const useMovementSession = (
                     setMessage(uiState.message);
 
                     const trackerState = analyser.getTrackerState();
-                    if (trackerState?.attempt_finished) {
-                        setIsAttemptFinished(true);
+                    if (trackerState) {
+                        if (trackerState.attempt_finished) {
+                            setIsAttemptFinished(true);
+                        }
+                        if ((trackerState as any).has_started_forward_swing) {
+                            setIsAttemptStarted(true);
+                        }
                     }
 
                     const colour = analyser.getOverlayColour();
@@ -184,7 +190,7 @@ const useMovementSession = (
         };
     }, [movementId, videoRef, canvasRef]);
 
-    return { progress, message, analyserRef, isAttemptFinished, currentTimestampRef };
+    return { progress, message, analyserRef, isAttemptFinished, isAttemptStarted, currentTimestampRef };
 };
 
 /**
@@ -285,7 +291,7 @@ export const RecordPage = () => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const hasAutoStarted = useRef<boolean>(false);
 
-    const { progress, message, analyserRef, isAttemptFinished, currentTimestampRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+    const { progress, message, analyserRef, isAttemptFinished, isAttemptStarted, currentTimestampRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
     // Initialise recorder and wire the stop event to trigger navigation
     const handleSavedAndNavigate = useCallback(() => {
@@ -302,13 +308,18 @@ export const RecordPage = () => {
     
     const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
 
-    // Auto-start recording when calibration completes
+    // Auto-start recording
     useEffect(() => {
-        if ((movementId === 'one-legged-stand' || movementId === 'underarm-throw') && progress === 100 && !isRecording && !hasAutoStarted.current) {
-            hasAutoStarted.current = true;
-            start();
+        if (!isRecording && !hasAutoStarted.current) {
+            if (movementId === 'one-legged-stand' && progress === 100) {
+                hasAutoStarted.current = true;
+                start();
+            } else if (movementId === 'underarm-throw' && isAttemptStarted) {
+                hasAutoStarted.current = true;
+                start();
+            }
         }
-    }, [progress, movementId, isRecording, start]);
+    }, [progress, isAttemptStarted, movementId, isRecording, start]);
 
     // Auto-stop recording when the attempt finishes
     useEffect(() => {

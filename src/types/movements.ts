@@ -54,4 +54,6 @@ export interface UnderarmThrowTracker extends BaseMovementTracker {
     is_underarm: boolean;
     throw_valid: boolean;
     validation_messages: string[];
+    has_started_forward_swing: boolean;
+    completion_timestamp: number | null;
 }
