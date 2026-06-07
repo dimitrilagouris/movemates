@@ -28,6 +28,9 @@ export interface AppSettings {
     freqResponse: number[];
     throwingArm: 'Right' | 'Left';
     swingAngle: number;
+    customGoals: { id: number; text: string; completed: boolean; dateAdded: string }[];
+    notes: string;
+    physiotherapist: string;
 }
 
 export type StoreName =
@@ -38,6 +41,8 @@ export type StoreName =
     | 'worldLandmarksFiltered'
     | 'attemptsData'
     | 'settings';
+
+const todayString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export const DEFAULT_SETTINGS: AppSettings = {
     filterMethod: 'global',
@@ -53,7 +58,14 @@ export const DEFAULT_SETTINGS: AppSettings = {
     freqResponse: [0.0],
     throwingArm: 'Right',
     swingAngle: 100,
-    userName: 'Mover'
+    userName: 'Mover',
+    customGoals: [
+        { id: 1, text: '', completed: false, dateAdded: todayString },
+        { id: 2, text: '', completed: false, dateAdded: todayString },
+        { id: 3, text: '', completed: false, dateAdded: todayString }
+    ],
+    notes: 'Working on post-surgery recovery. Needs focused attention on right knee stability.',
+    physiotherapist: 'Dr. Sarah Johnson'
 };
 
 // --- Database Engine ---

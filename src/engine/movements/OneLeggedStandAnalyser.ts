@@ -128,6 +128,34 @@ export class OneLeggedStandAnalyser implements MovementAnalyser<OneLeggedStandTr
         this.tracker = this.initialiseTracker();
     }
 
+    reset(): void {
+        throw new Error("Method not implemented.");
+    }
+    setTime(currentTime: number): void {
+        throw new Error("Method not implemented.");
+    }
+    configure(settings?: any): void {
+        throw new Error("Method not implemented.");
+    }
+    calibrate(landmarksData: LandmarksData, frameThreshold?: number): CalibrationTracker {
+        throw new Error("Method not implemented.");
+    }
+    isCalibrationValid(): boolean {
+        throw new Error("Method not implemented.");
+    }
+    analyse(landmarksData: LandmarksData, frameIndex?: number): OneLeggedStandTracker {
+        throw new Error("Method not implemented.");
+    }
+    populateCalibrationProgress(progressElement: HTMLElement): void {
+        throw new Error("Method not implemented.");
+    }
+    populateMetrics(metricsElement: HTMLElement): void {
+        throw new Error("Method not implemented.");
+    }
+    populateMovementProgress(attempt: number, progressElement: HTMLElement): void {
+        throw new Error("Method not implemented.");
+    }
+
     private initialiseTracker(): OneLeggedStandTracker {
         return {
             is_standing: false,

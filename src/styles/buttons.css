@@ -16,7 +16,7 @@
 .nav-tabs-indicator {
     position: absolute;
     height: calc(100% - var(--space-1)*2);
-    background-color: white;
+    background-color: var(--colour-white);
     border-radius: var(--radius-md);
     top: 50%;
     left: 0;
@@ -82,7 +82,7 @@
 
 .btn-primary {
     background-color: var(--colour-slate-900);
-    color: white;
+    color: var(--colour-white);
     border: 1px solid transparent;
 }
 .btn-primary:hover {
@@ -91,7 +91,7 @@
 
 .btn-danger {
     background-color: var(--colour-red-600);
-    color: white;
+    color: var(--colour-white);
     border: 1px solid transparent;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .btn-secondary {
-    background-color: white;
+    background-color: var(--colour-white);
     color: var(--colour-slate-900);
 }
 .btn-secondary:hover {

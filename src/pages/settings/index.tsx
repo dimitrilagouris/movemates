@@ -8,6 +8,7 @@ import { LANDMARK_NAMES } from '../../types/landmarks';
 import { Button } from '../../components/common/Button';
 import { ToggleTabs } from '../../components/common/ToggleTabs';
 import { ScrubberBar } from '../../components/common/ScrubberBar'; // NEW: Imported the custom scrubber
+import { LocalGridPanel } from './LocalGridPanel';
 import './style.css';
 
 // --- Pure UI Components ---
@@ -51,6 +52,26 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
                 placeholder="e.g. John Doe"
                 value={settings.userName || ''}
                 onChange={(e) => onChange('userName', e.target.value)}
+            />
+        </SettingRow>
+
+        <SettingRow title="Physiotherapist" description="Your assigned healthcare professional.">
+            <input
+                type="text"
+                className="setting-input"
+                placeholder="e.g. Dr. Sarah Johnson"
+                value={settings.physiotherapist || ''}
+                onChange={(e) => onChange('physiotherapist', e.target.value)}
+            />
+        </SettingRow>
+
+        <SettingRow title="Notes" description="Key information about your rehab or fitness context.">
+            <textarea
+                className="setting-input"
+                placeholder="Add context notes here..."
+                value={settings.notes || ''}
+                onChange={(e) => onChange('notes', e.target.value)}
+                style={{ resize: 'vertical', minHeight: '80px' }}
             />
         </SettingRow>
     </div>
@@ -138,70 +159,7 @@ const ThrowSettingsPanel = ({ settings, onChange }: { settings: AppSettings, onC
     );
 };
 
-const LocalGridPanel = ({
-                            selected,
-                            toggleSelection,
-                            selectAll,
-                            deselectAll
-                        }: {
-    selected: Set<string>,
-    toggleSelection: (id: string) => void,
-    selectAll: () => void,
-    deselectAll: () => void
-}) => {
-    const handleRowSelect = (landmark: string) => {
-        ['x', 'y', 'z'].forEach(axis => toggleSelection(`${landmark}_${axis}`));
-    };
 
-    return (
-        <div className="settings-section">
-            <h3 className="settings-section__title">Local Filter Targeting</h3>
-
-            <div className="grid-controls">
-                <Button variant="secondary" size="small" onClick={selectAll}>Select All</Button>
-                <Button variant="secondary" size="small" onClick={deselectAll}>Deselect All</Button>
-                <span className="selection-info-text">{selected.size} active targets</span>
-            </div>
-
-            <div className="landmark-grid-wrapper shadow-1">
-                <table className="landmark-grid">
-                    <thead>
-                    <tr>
-                        <th>Joint / Landmark</th>
-                        <th>X</th>
-                        <th>Y</th>
-                        <th>Z</th>
-                        <th>Row</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {LANDMARK_NAMES.map(name => (
-                        <tr key={name}>
-                            <td className="font-medium capitalize">{name.replace(/_/g, ' ')}</td>
-                            {['x', 'y', 'z'].map(axis => {
-                                const id = `${name}_${axis}`;
-                                return (
-                                    <td key={id}>
-                                        <input
-                                            type="checkbox"
-                                            className="grid-checkbox"
-                                            checked={selected.has(id)}
-                                            onChange={() => toggleSelection(id)}
-                                        />
-                                    </td>
-                                );
-                            })}
-                            <td>
-                                <Button variant="text" size="small" onClick={() => handleRowSelect(name)}>All</Button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-};
 
 // --- Main Page Component ---
 

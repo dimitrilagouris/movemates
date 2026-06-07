@@ -1,7 +1,7 @@
 import { type MovementId } from '../../types/movements';
 import { type MovementAnalyserFactory } from './MovementAnalyserFactory';
 import { OneLeggedStandFactory } from './OneLeggedStandFactory';
-// import { UnderarmThrowFactory } from './UnderarmThrowFactory';
+import { UnderarmThrowFactory } from './UnderarmThrowFactory';
 // import { SquatFactory } from './SquatFactory';
 
 /**
@@ -9,7 +9,7 @@ import { OneLeggedStandFactory } from './OneLeggedStandFactory';
  */
 const registry: Record<string, MovementAnalyserFactory> = {
     'one-legged-stand': new OneLeggedStandFactory(),
-    // 'underarm-throw': new UnderarmThrowFactory(),
+    'underarm-throw': new UnderarmThrowFactory(),
     // 'squat': new SquatFactory(),
 };
 

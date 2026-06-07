@@ -16,6 +16,7 @@ import { drawSkeletonConnections, drawJointPoints } from '../../../engine/mediap
 import { DatabaseEngine } from '../../../engine/db';
 import './style.css';
 import {Button} from "../../../components/common/Button.tsx";
+import { getLiveMetricsCard } from '../../../components/live-metrics/LiveMetricsRegistry';
 
 /**
  * Manages the native MediaRecorder API to capture, encode, and store video.
@@ -101,9 +102,20 @@ const useMovementSession = (
     const [progress, setProgress] = useState<number>(0);
     const [message, setMessage] = useState<string>("Loading AR tracking engine...");
     const [isAttemptFinished, setIsAttemptFinished] = useState<boolean>(false);
+    const [isAttemptStarted, setIsAttemptStarted] = useState<boolean>(false);
 
     const detectorRef = useRef(new MediaPipeDetector());
     const analyserRef = useRef<MovementAnalyser<any> | null>(null);
+    const currentTimestampRef = useRef<number>(0);
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            const db = new DatabaseEngine();
+            const settings = await db.loadSettings();
+            detectorRef.current.updateSettings(settings);
+        };
+        loadSettings();
+    }, []);
 
     useEffect(() => {
         if (movementId) {
@@ -143,6 +155,7 @@ const useMovementSession = (
 
                 // mediaTime is the frame's actual capture timestamp in seconds
                 const timestamp = metadata.mediaTime * 1000;
+                currentTimestampRef.current = timestamp;
                 const landmarksData = detector.detect(video, timestamp);
 
                 if (landmarksData?.landmarks[0]) {
@@ -153,8 +166,13 @@ const useMovementSession = (
                     setMessage(uiState.message);
 
                     const trackerState = analyser.getTrackerState();
-                    if (trackerState?.attempt_finished) {
-                        setIsAttemptFinished(true);
+                    if (trackerState) {
+                        if (trackerState.attempt_finished) {
+                            setIsAttemptFinished(true);
+                        }
+                        if ((trackerState as any).has_started_forward_swing) {
+                            setIsAttemptStarted(true);
+                        }
                     }
 
                     const colour = analyser.getOverlayColour();
@@ -181,7 +199,7 @@ const useMovementSession = (
         };
     }, [movementId, videoRef, canvasRef]);
 
-    return { progress, message, analyserRef, isAttemptFinished };
+    return { progress, message, analyserRef, isAttemptFinished, isAttemptStarted, currentTimestampRef };
 };
 
 /**
@@ -282,7 +300,7 @@ export const RecordPage = () => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const hasAutoStarted = useRef<boolean>(false);
 
-    const { progress, message, analyserRef, isAttemptFinished } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
+    const { progress, message, analyserRef, isAttemptFinished, isAttemptStarted, currentTimestampRef } = useMovementSession(movementId, videoRef, canvasRef, isRecording);
 
     // Initialise recorder and wire the stop event to trigger navigation
     const handleSavedAndNavigate = useCallback(() => {
@@ -299,24 +317,30 @@ export const RecordPage = () => {
     
     const { start, stop, restart } = useVideoRecorder(videoRef, setIsRecording, handleSavedAndNavigate);
 
-    // Auto-start recording when calibration completes
+    // Auto-start recording
     useEffect(() => {
-        // We scope this strictly to the one-legged stand as requested
-        if (movementId === 'one-legged-stand' && progress === 100 && !isRecording && !hasAutoStarted.current) {
-            hasAutoStarted.current = true;
-            start();
+        if (!isRecording && !hasAutoStarted.current) {
+            if (movementId === 'one-legged-stand' && progress === 100) {
+                hasAutoStarted.current = true;
+                start();
+            } else if (movementId === 'underarm-throw' && isAttemptStarted) {
+                hasAutoStarted.current = true;
+                start();
+            }
         }
-    }, [progress, movementId, isRecording, start]);
+    }, [progress, isAttemptStarted, movementId, isRecording, start]);
 
     // Auto-stop recording when the attempt finishes
     useEffect(() => {
-        if (movementId == 'one-legged-stand' && isAttemptFinished && isRecording) {
+        if ((movementId === 'one-legged-stand' || movementId === 'underarm-throw') && isAttemptFinished && isRecording) {
             stop();
         }
     }, [isAttemptFinished, movementId, isRecording, stop]);
 
     const movement: Movement | null = movementId ? MOVEMENTS[movementId] : null;
     if (!movement) return <div>Movement not found</div>;
+
+    const LiveMetricsComponent = getLiveMetricsCard(movementId);
 
     return (
         <div className="learn-page">
@@ -357,6 +381,13 @@ export const RecordPage = () => {
 
                 <aside className="learn-sidebar shadow-1">
                     <CalibrationCard progress={progress} message={message} />
+                    {LiveMetricsComponent && (
+                        <LiveMetricsComponent 
+                            movementId={movementId!} 
+                            analyserRef={analyserRef} 
+                            currentTimestampRef={currentTimestampRef} 
+                        />
+                    )}
                     <InstructionsCard instructions={movement.instructions} />
                 </aside>
             </main>
