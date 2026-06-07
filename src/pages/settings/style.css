@@ -154,7 +154,7 @@
 .setting-input:focus {
     outline: none;
     border-color: var(--colour-zinc-900);
-    box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.1);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-zinc-900) 10%, transparent);
 }
 
 .w-24 { width: 96px; } /* Helper class for tight number inputs */

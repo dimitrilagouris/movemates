@@ -12,11 +12,11 @@
     left: 0;
     right: 0;
     height: 6px;
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-full);
     background: repeating-linear-gradient(
             to right,
-            var(--colour-zinc-300, #d4d4d8) 0px,
-            var(--colour-zinc-300, #d4d4d8) 2px,
+            var(--colour-zinc-300) 0px,
+            var(--colour-zinc-300) 2px,
             transparent 2px,
             transparent 6px
     );
@@ -29,7 +29,7 @@
     left: 0;
     height: 6px;
     background-color: var(--colour-slate-800);
-    border-radius: var(--radius-full, 999px) 0 0 var(--radius-full, 999px);
+    border-radius: var(--radius-full) 0 0 var(--radius-full);
     z-index: 2;
     pointer-events: none;
     min-width: 0; /* Prevents negative calc tracking anomalies at zero boundary */
@@ -43,7 +43,7 @@
     width: 6px;
     height: 24px;
     background-color: var(--colour-slate-800);
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-full);
     z-index: 3;
     pointer-events: none;
 }
@@ -65,7 +65,7 @@
 
 /* Provide a focus state for keyboard navigation */
 .scrubber-input:focus-visible ~ .scrubber-thumb {
-    box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.3);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-slate-800) 30%, transparent);
 }
 
 .swing-slider-container {
