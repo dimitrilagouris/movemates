@@ -14,7 +14,7 @@ import { DatabaseEngine } from '../../../engine/db';
 import { Button } from '../../../components/common/Button';
 import { StatCard } from '../../../components/common/StatCard';
 import { type OneLeggedStandTracker } from '../../../engine/movements/OneLeggedStandAnalyser';
-import { getShoulderAbduction, getHipAbduction, getKneeValgus } from '../../../engine/math/geometry';
+import { ReportExporter, OneLeggedStandExportStrategy } from '../../../engine/export';
 import './style.css';
 
 export const ReportPage = () => {
@@ -77,7 +77,10 @@ export const ReportPage = () => {
                 </div>
                 <div className="report-header__actions" style={{ display: 'flex', gap: 'var(--space-3)' }}>
                     <Button variant="text" onClick={() => {}}>Share</Button>
-                    <Button variant="primary" className="shadow-1" onClick={() => {}}>Save</Button>
+                    <Button variant="primary" className="shadow-1" onClick={() => {
+                        const exporter = new ReportExporter();
+                        exporter.export(movementId, latestTracker);
+                    }}>Save</Button>
                 </div>
             </header>
 
@@ -119,33 +122,8 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
     const isCorrectForm = !tracker.legs_crossed;
 
     const chartData = useMemo(() => {
-        if (!tracker.landmark_series || tracker.landmark_series.length === 0) return [];
-        
-        const startTime = tracker.landmark_series[0].timestamp;
-
-        return tracker.landmark_series.map((frame) => {
-            const lms = frame.landmarks.landmarks[0];
-            if (!lms) return null;
-
-            const lShoulder = lms[11], rShoulder = lms[12];
-            const lElbow = lms[13], rElbow = lms[14];
-            const lHip = lms[23], rHip = lms[24];
-            const lKnee = lms[25], rKnee = lms[26];
-            const lAnkle = lms[27], rAnkle = lms[28];
-
-            if (!lShoulder || !rShoulder || !lElbow || !rElbow || !lHip || !rHip || !lKnee || !rKnee || !lAnkle || !rAnkle) return null;
-
-            return {
-                time: Math.round((frame.timestamp - startTime) * 10) / 10,
-                lShoulderAbd: getShoulderAbduction(lShoulder, lElbow, lHip),
-                rShoulderAbd: getShoulderAbduction(rShoulder, rElbow, rHip),
-                lHipAbd: getHipAbduction(lShoulder, lHip, lKnee),
-                rHipAbd: getHipAbduction(rShoulder, rHip, rKnee),
-                lKneeValgus: getKneeValgus(lHip, lKnee, lAnkle),
-                rKneeValgus: getKneeValgus(rHip, rKnee, rAnkle),
-            };
-        }).filter(Boolean);
-    }, [tracker.landmark_series]);
+        return OneLeggedStandExportStrategy.generateChartData(tracker);
+    }, [tracker]);
 
     const maxVals = useMemo(() => {
         if (!chartData.length) return null;
