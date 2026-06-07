@@ -49,6 +49,10 @@ export const MovementsPage = (): JSX.Element => {
                     />
                 ))}
             </section>
+
+            <div style={{ marginTop: 'var(--space-12)', textAlign: 'center', color: 'var(--colour-zinc-500)', fontSize: '13px', padding: '0 var(--space-4)' }}>
+                Movemates is an AI screening tool, not a substitute for professional medical advice. Always consult your physiotherapist for diagnoses.
+            </div>
         </div>
     );
 };

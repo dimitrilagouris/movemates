@@ -69,18 +69,16 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onChange }) => {
                     </div>
                 </div>
             </div>
-            {goal.text.trim() !== '' && (
-                <div style={{ 
-                    alignSelf: 'flex-end', 
-                    fontSize: '10px', 
-                    fontFamily: 'var(--font-mono, monospace)', 
-                    color: 'oklch(0.5 0 0)', 
-                    paddingTop: '6px',
-                    paddingRight: '12px'
-                }}>
-                    Added: {goal.dateAdded || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </div>
-            )}
+            <div style={{ 
+                alignSelf: 'flex-end', 
+                fontSize: '10px', 
+                fontFamily: 'var(--font-mono, monospace)', 
+                color: 'oklch(0.5 0 0)', 
+                paddingTop: '6px',
+                paddingRight: '12px'
+            }}>
+                Added: {goal.text.trim() !== '' ? (goal.dateAdded || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })) : 'N/A'}
+            </div>
         </div>
     );
 };

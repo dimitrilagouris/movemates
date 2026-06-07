@@ -1,4 +1,7 @@
 import type {Movement} from '../types/movements';
+import underarmThrowImg from '../assets/under_arm_throw.png';
+import oneLeggedStandImg from '../assets/one_legged_standing.png';
+import walkingExerciseImg from '../assets/walking_exercising.png';
 
 export const MOVEMENTS: Record<string, Movement> = {
     'underarm-throw': {
@@ -6,7 +9,7 @@ export const MOVEMENTS: Record<string, Movement> = {
         title: 'Underarm Throw',
         subtitle: 'Practice your throwing skills.',
         description: 'Practice your throwing skills! Toss a ball underhand.',
-        imageUrl: '',
+        imageUrl: underarmThrowImg,
         instructions: [
             "Stand with feet shoulder-width apart",
             "Starting at waist level, swing your arm back",
@@ -29,7 +32,7 @@ export const MOVEMENTS: Record<string, Movement> = {
         title: 'One-Legged Stand',
         subtitle: 'Test your balance.',
         description: 'Test your balance! Stand on one leg and see how long you can stay steady.',
-        imageUrl: '',
+        imageUrl: oneLeggedStandImg,
         instructions: [
             "Stand up straight with your feet together",
             "Lift one foot off the ground",
@@ -52,7 +55,7 @@ export const MOVEMENTS: Record<string, Movement> = {
         title: 'Walking Exercise',
         subtitle: 'Analyse your gait.',
         description: "Let's see how you walk! Walk across the room in a straight line.",
-        imageUrl: '',
+        imageUrl: walkingExerciseImg,
         instructions: [
             "Stand with your feet shoulder-width apart",
             "Rise up onto your toes",
