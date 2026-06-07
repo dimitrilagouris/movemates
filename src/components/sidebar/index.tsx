@@ -67,10 +67,7 @@ export const Sidebar = (): JSX.Element => {
                     onClick={() => navigate('/settings')}
                 />
 
-                <UserProfile
-                    name="Account"
-                    avatarUrl=""
-                />
+                <UserProfile />
             </div>
         </aside>
     );
