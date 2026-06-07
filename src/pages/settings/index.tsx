@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, useRef } from 'react';
 import {
     RiErrorWarningFill, RiSaveFill, RiDownloadFill,
-    RiUploadFill, RiRestartLine, RiMagicFill
+    RiUploadFill, RiRestartLine, RiMagicFill, RiUserLine, RiStethoscopeLine
 } from "react-icons/ri";
 import { DatabaseEngine, type AppSettings, DEFAULT_SETTINGS } from '../../engine/db/DatabaseEngine';
 import { LANDMARK_NAMES } from '../../types/landmarks';
@@ -9,6 +9,8 @@ import { Button } from '../../components/common/Button';
 import { ToggleTabs } from '../../components/common/ToggleTabs';
 import { ScrubberBar } from '../../components/common/ScrubberBar'; // NEW: Imported the custom scrubber
 import { LocalGridPanel } from './LocalGridPanel';
+import { TextInput } from '../../components/common/TextInput';
+import { SelectInput } from '../../components/common/SelectInput';
 import './style.css';
 
 // --- Pure UI Components ---
@@ -45,9 +47,8 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
     <div className="settings-section">
         <h3 className="settings-section__title">Profile Overview</h3>
 
-        <SettingRow title="Display Name" description="Your name will be displayed on the sidebar and used in your generated assessment reports.">
-            <input
-                type="text"
+        <SettingRow title="Display Name" description="How you appear in the app and on exported reports.">
+            <TextInput
                 className="setting-input"
                 placeholder="e.g. John Doe"
                 value={settings.userName || ''}
@@ -56,8 +57,7 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
         </SettingRow>
 
         <SettingRow title="Physiotherapist" description="Your assigned healthcare professional.">
-            <input
-                type="text"
+            <TextInput
                 className="setting-input"
                 placeholder="e.g. Dr. Sarah Johnson"
                 value={settings.physiotherapist || ''}
@@ -66,12 +66,13 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
         </SettingRow>
 
         <SettingRow title="Notes" description="Key information about your rehab or fitness context.">
-            <textarea
+            <TextInput
+                multiline
+                resizable
                 className="setting-input"
                 placeholder="Add context notes here..."
                 value={settings.notes || ''}
                 onChange={(e) => onChange('notes', e.target.value)}
-                style={{ resize: 'vertical', minHeight: '80px' }}
             />
         </SettingRow>
     </div>
@@ -82,22 +83,32 @@ const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChang
         <h3 className="settings-section__title">Basics</h3>
 
         <SettingRow title="Filter Method" description="Apply globally or target specific anatomical joints.">
-            <select className="setting-input" value={settings.filterMethod} onChange={(e) => onChange('filterMethod', e.target.value)}>
-                <option value="global">Global Filtering</option>
-                <option value="local">Local Overrides</option>
-            </select>
+            <SelectInput 
+                className="setting-input" 
+                value={settings.filterMethod} 
+                onChange={(e) => onChange('filterMethod', e.target.value)}
+                options={[
+                    { value: 'global', label: 'Global Filtering' },
+                    { value: 'local', label: 'Local Overrides' }
+                ]}
+            />
         </SettingRow>
 
         <SettingRow title="Algorithm Type" description="The core mathematical approach used to eliminate coordinate jitter.">
-            <select className="setting-input" value={settings.filterType} onChange={(e) => onChange('filterType', e.target.value)}>
-                <option value="OneEuro">OneEuro (Adaptive)</option>
-                <option value="IIR">IIR (Feedback)</option>
-                <option value="Freqz">Freqz (FIR Mask)</option>
-            </select>
+            <SelectInput 
+                className="setting-input" 
+                value={settings.filterType} 
+                onChange={(e) => onChange('filterType', e.target.value)}
+                options={[
+                    { value: 'OneEuro', label: 'OneEuro (Adaptive)' },
+                    { value: 'IIR', label: 'IIR (Feedback)' },
+                    { value: 'Freqz', label: 'Freqz (FIR Mask)' }
+                ]}
+            />
         </SettingRow>
 
         <SettingRow title="Sample Rate (Hz)" description="Assumed camera capture rate for velocity calculations.">
-            <input type="number" className="setting-input w-24" value={settings.sampleRate} onChange={(e) => onChange('sampleRate', Number(e.target.value))} />
+            <TextInput type="number" className="setting-input w-24" value={settings.sampleRate} onChange={(e) => onChange('sampleRate', Number(e.target.value))} />
         </SettingRow>
     </div>
 );
@@ -110,15 +121,15 @@ const AlgorithmSection = ({ settings, onChange }: { settings: AppSettings, onCha
             <h3 className="settings-section__title">1-Euro Parameters</h3>
 
             <SettingRow title="Min Cutoff Frequency" description="Lower values increase smoothing but introduce motion lag.">
-                <input type="number" className="setting-input w-24" step="0.1" value={settings.mincutoff} onChange={(e) => onChange('mincutoff', Number(e.target.value))} />
+                <TextInput type="number" className="setting-input w-24" step="0.1" value={settings.mincutoff} onChange={(e) => onChange('mincutoff', Number(e.target.value))} />
             </SettingRow>
 
             <SettingRow title="Speed Coefficient (Beta)" description="Higher values force faster snapping to sudden movements.">
-                <input type="number" className="setting-input w-24" step="0.0001" value={settings.beta_} onChange={(e) => onChange('beta_', Number(e.target.value))} />
+                <TextInput type="number" className="setting-input w-24" step="0.0001" value={settings.beta_} onChange={(e) => onChange('beta_', Number(e.target.value))} />
             </SettingRow>
 
             <SettingRow title="Derivative Cutoff" description="Strictness of internal speed estimation.">
-                <input type="number" className="setting-input w-24" step="0.1" value={settings.dcutoff} onChange={(e) => onChange('dcutoff', Number(e.target.value))} />
+                <TextInput type="number" className="setting-input w-24" step="0.1" value={settings.dcutoff} onChange={(e) => onChange('dcutoff', Number(e.target.value))} />
             </SettingRow>
         </div>
     );

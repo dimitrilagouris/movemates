@@ -16,12 +16,14 @@ export const MovementCard = ({ title, description, imageUrl, onClick }: Movement
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
         >
-            <img
-                src={imageUrl}
-                alt=""
-                className="movement-card__image"
-                loading="lazy"
-            />
+            <div className="movement-card__image-wrapper">
+                <img
+                    src={imageUrl}
+                    alt=""
+                    className="movement-card__image"
+                    loading="lazy"
+                />
+            </div>
 
             <div className="movement-card__content">
                 <h3 className="movement-card__title">{title}</h3>

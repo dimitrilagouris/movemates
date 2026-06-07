@@ -42,45 +42,97 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onChange }) => {
                             color: '#fff',
                             cursor: 'pointer',
                             flexShrink: 0,
-                            padding: 0
+                            padding: 0,
+                            transition: 'all 0.3s ease'
                         }}
                         onClick={() => onChange({ ...goal, completed: !goal.completed })}
                     >
-                        {goal.completed && <RiCheckLine size={16} />}
+                        <svg 
+                            width="14" height="14" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="3" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            style={{
+                                strokeDasharray: 24,
+                                strokeDashoffset: goal.completed ? 0 : 24,
+                                transition: 'stroke-dashoffset 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.1s',
+                                opacity: goal.completed ? 1 : 0
+                            }}
+                        >
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
                     </button>
                     
-                    <div style={{ flex: 1 }}>
-                        <input
-                            type="text"
-                            placeholder="Enter your goal..."
-                            value={goal.text}
-                            onChange={handleTextChange}
-                            style={{
-                                width: '100%',
-                                border: 'none',
-                                outline: 'none',
-                                background: 'transparent',
+                    <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        {/* 
+                          We use a relative inline-block wrapper here that dynamically 
+                          sizes itself to the text (via the hidden span).
+                          This allows the absolute strike-line to only be as wide as the text!
+                        */}
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <span style={{
+                                visibility: 'hidden',
                                 fontSize: 'var(--text-sm)',
                                 fontWeight: 'var(--font-weight-medium)',
-                                color: goal.completed ? 'oklch(0.5 0 0)' : 'oklch(0.2 0 0)',
-                                textDecoration: goal.completed ? 'line-through' : 'none',
-                            }}
-                        />
+                                whiteSpace: 'pre',
+                                pointerEvents: 'none',
+                                display: 'inline-block'
+                            }}>
+                                {goal.text || ' '}
+                            </span>
+                            
+                            <input
+                                type="text"
+                                placeholder="Enter your goal..."
+                                value={goal.text}
+                                onChange={handleTextChange}
+                                style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                    height: '100%',
+                                    width: '100%',
+                                    minWidth: '200px', /* Allow typing beyond the span width */
+                                    border: 'none',
+                                    outline: 'none',
+                                    background: 'transparent',
+                                    fontSize: 'var(--text-sm)',
+                                    fontWeight: 'var(--font-weight-medium)',
+                                    color: goal.completed ? 'oklch(0.5 0 0)' : 'oklch(0.2 0 0)',
+                                    transition: 'color 0.3s ease'
+                                }}
+                            />
+                            
+                            {/* The animated strikethrough line */}
+                            <div style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: '50%',
+                                height: '2px',
+                                backgroundColor: 'oklch(0.5 0 0)',
+                                transform: 'translateY(-50%)',
+                                width: goal.completed ? '100%' : '0%',
+                                transition: 'width 0.4s cubic-bezier(0.65, 0, 0.45, 1)',
+                                pointerEvents: 'none',
+                                opacity: goal.completed ? 1 : 0
+                            }} />
+                        </div>
                     </div>
                 </div>
             </div>
-            {goal.text.trim() !== '' && (
-                <div style={{ 
-                    alignSelf: 'flex-end', 
-                    fontSize: '10px', 
-                    fontFamily: 'var(--font-mono, monospace)', 
-                    color: 'oklch(0.5 0 0)', 
-                    paddingTop: '6px',
-                    paddingRight: '12px'
-                }}>
-                    Added: {goal.dateAdded || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </div>
-            )}
+            <div style={{ 
+                alignSelf: 'flex-end', 
+                fontSize: '10px', 
+                fontFamily: 'var(--font-mono, monospace)', 
+                color: 'oklch(0.5 0 0)', 
+                paddingTop: '6px',
+                paddingRight: '12px'
+            }}>
+                Added: {goal.text.trim() !== '' ? (goal.dateAdded || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })) : 'N/A'}
+            </div>
         </div>
     );
 };

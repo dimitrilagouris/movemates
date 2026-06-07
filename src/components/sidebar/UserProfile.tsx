@@ -1,12 +1,36 @@
-export interface UserProfileProps {
-    name: string;
-    avatarUrl: string;
-}
+import { useState, useEffect } from 'react';
+import { DatabaseEngine } from '../../engine/db/DatabaseEngine';
 
-export const UserProfile = ({ name, avatarUrl }: { name: string, avatarUrl: string }) => {
+export const UserProfile = () => {
+    const [name, setName] = useState('User');
+
+    useEffect(() => {
+        const loadName = async () => {
+            const db = new DatabaseEngine();
+            const settings = await db.loadSettings();
+            if (settings?.userName) {
+                setName(settings.userName);
+            }
+        };
+        loadName();
+    }, []);
+
+    const initial = name.charAt(0).toUpperCase();
+
     return (
         <div className="user-profile">
-            <img src={avatarUrl || "https://via.placeholder.com/32"} alt={name} className="user-profile__avatar" />
+            <div className="user-profile__avatar" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                backgroundColor: 'var(--colour-zinc-200)', 
+                color: 'var(--colour-zinc-700)', 
+                fontWeight: 600,
+                fontSize: '14px',
+                borderRadius: '50%'
+            }}>
+                {initial}
+            </div>
             <div className="user-profile__info">
                 <span className="user-profile__name">{name}</span>
             </div>
