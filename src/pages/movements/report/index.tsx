@@ -85,6 +85,21 @@ export const ReportPage = () => {
             </header>
 
             <main className="report-page">
+                <div style={{ 
+                    backgroundColor: 'color-mix(in srgb, var(--colour-zinc-500) 10%, transparent)', 
+                    borderRadius: 'var(--radius-md)', 
+                    padding: 'var(--space-4)', 
+                    marginBottom: 'var(--space-6)', 
+                    display: 'flex', 
+                    alignItems: 'flex-start', 
+                    gap: 'var(--space-3)' 
+                }}>
+                    <RiAlertLine size={20} style={{ color: 'var(--colour-zinc-600)', flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-900)', lineHeight: '1.5' }}>
+                        <strong>Disclaimer:</strong> This automated assessment is intended for informational purposes only. Please consult your physiotherapist or a qualified healthcare professional before making any medical decisions based on these results.
+                    </p>
+                </div>
+
                 {movementId === 'one-legged-stand' && (
                     <OneLeggedStandReport tracker={latestTracker as OneLeggedStandTracker} />
                 )}

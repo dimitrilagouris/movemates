@@ -1,0 +1,219 @@
+/* ==========================================================================
+   Progress Page Layout
+   ========================================================================== */
+
+.progress-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--colour-white);
+    overflow: hidden;
+}
+
+.progress-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.progress-main {
+    padding: var(--space-8);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    background-color: var(--colour-white);
+}
+
+/* ==========================================================================
+   Goal Cards
+   ========================================================================== */
+
+.progress-goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+.goal-card {
+    padding: var(--space-1);
+    background-color: var(--colour-grey-100); /* Grey outer container */
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.goal-card__main {
+    background-color: var(--colour-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02); /* Very subtle internal shadow */
+}
+
+
+
+/* ==========================================================================
+   Framework Tabs
+   ========================================================================== */
+
+.progress-framework {
+    background-color: var(--colour-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--colour-grey-200);
+    overflow: hidden;
+}
+
+.progress-framework__header {
+    border-bottom: 1px solid var(--colour-grey-200);
+}
+
+.progress-framework__header h4 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--colour-grey-800);
+    padding: var(--space-3) var(--space-4);
+    margin: 0;
+}
+
+.progress-framework__tabs {
+    display: flex;
+    gap: var(--space-6);
+    padding: 0 var(--space-4);
+}
+
+.framework-tab {
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--colour-grey-500);
+    padding: var(--space-2) 0;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.framework-tab.active {
+    color: var(--colour-amber-600);
+    border-bottom-color: var(--colour-amber-500);
+}
+
+.progress-framework__body {
+    padding: var(--space-4);
+}
+
+.framework-lifecycle {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.lifecycle-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+}
+
+.lifecycle-title {
+    font-weight: var(--font-weight-bold);
+    color: var(--colour-grey-800);
+}
+
+.lifecycle-dates {
+    color: var(--colour-grey-500);
+}
+
+.lifecycle-bar {
+    display: flex;
+    gap: 4px;
+}
+
+.lifecycle-segment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.segment-line {
+    height: 4px;
+    border-radius: 2px;
+}
+
+.segment-blue { background-color: var(--colour-amber-400); }
+.segment-grey { background-color: var(--colour-grey-300); }
+
+.segment-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--colour-grey-700);
+}
+
+/* ==========================================================================
+   Import Report Empty State
+   ========================================================================== */
+
+.import-report-empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--colour-white);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--colour-grey-300);
+    padding: var(--space-8) var(--space-6);
+    margin-top: var(--space-4);
+    min-height: 300px;
+}
+
+.empty-state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 360px;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--colour-grey-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--colour-grey-500);
+    margin-bottom: var(--space-4);
+}
+
+.empty-state-content h3 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--colour-grey-900);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.empty-state-content p {
+    font-size: var(--text-sm);
+    color: var(--colour-grey-500);
+    margin: 0 0 var(--space-6) 0;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Progress Sidebar
+   ========================================================================== */
+
+.progress-sidebar {
+    background-color: var(--colour-white);
+    border-left: 1px solid var(--colour-zinc-200);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.progress-sidebar--empty {
+    justify-content: center;
+    align-items: center;
+    color: var(--colour-zinc-500);
+    font-size: var(--text-sm);
+    padding: var(--space-6);
+}

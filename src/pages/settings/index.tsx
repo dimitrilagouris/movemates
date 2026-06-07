@@ -53,6 +53,26 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
                 onChange={(e) => onChange('userName', e.target.value)}
             />
         </SettingRow>
+
+        <SettingRow title="Physiotherapist" description="Your assigned healthcare professional.">
+            <input
+                type="text"
+                className="setting-input"
+                placeholder="e.g. Dr. Sarah Johnson"
+                value={settings.physiotherapist || ''}
+                onChange={(e) => onChange('physiotherapist', e.target.value)}
+            />
+        </SettingRow>
+
+        <SettingRow title="Notes" description="Key information about your rehab or fitness context.">
+            <textarea
+                className="setting-input"
+                placeholder="Add context notes here..."
+                value={settings.notes || ''}
+                onChange={(e) => onChange('notes', e.target.value)}
+                style={{ resize: 'vertical', minHeight: '80px' }}
+            />
+        </SettingRow>
     </div>
 );
 

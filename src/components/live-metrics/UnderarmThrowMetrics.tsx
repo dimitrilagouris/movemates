@@ -55,11 +55,23 @@ export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, 
             <div className="live-metrics-bottom">
                 <div className="live-metrics-col">
                     <div className="live-metrics-col-header">
-                        <span className="live-metrics-icon live-metrics-icon--purple">A</span>
                         <span className="live-metrics-col-title">Swing Angle</span>
                     </div>
-                    <div className="live-metrics-col-value live-metrics-mono">
-                        {metrics.swingAngle}° / 100°
+                    <div className="live-metrics-col-value live-metrics-mono" style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', gap: '2px', width: '100%', height: '8px', marginBottom: '4px' }}>
+                            {Array.from({ length: 10 }).map((_, i) => {
+                                const completed = i < Math.floor(parseFloat(metrics.swingAngle) / 10);
+                                return (
+                                    <div key={i} style={{
+                                        flex: 1,
+                                        backgroundColor: completed ? 'var(--colour-lime-500)' : 'var(--colour-zinc-200)',
+                                        borderRadius: '2px',
+                                        boxShadow: completed ? 'inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.05)' : 'inset 0 1px 1px rgba(0,0,0,0.05)'
+                                    }} />
+                                );
+                            })}
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--colour-zinc-500)' }}>{metrics.swingAngle}°</div>
                     </div>
                 </div>
                 <div className="live-metrics-col">
@@ -75,7 +87,6 @@ export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, 
             <div className="live-metrics-bottom" style={{ marginTop: 'var(--space-2)' }}>
                 <div className="live-metrics-col">
                     <div className="live-metrics-col-header">
-                        <span className="live-metrics-icon live-metrics-icon--blue">T</span>
                         <span className="live-metrics-col-title">Valid</span>
                     </div>
                     <div className="live-metrics-col-value">

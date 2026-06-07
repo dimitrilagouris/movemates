@@ -6,6 +6,7 @@ import { RecordPage } from "./pages/movements/record";
 import { ReplayPage } from "./pages/movements/replay";
 import { ReportPage } from "./pages/movements/report";
 import { SettingsPage } from "./pages/settings";
+import { ProgressPage } from "./pages/progress";
 
 import './styles/base.css';
 import './styles/buttons.css';
@@ -25,6 +26,8 @@ function App(): JSX.Element {
                     <Route path="/movements/record/:movementId" element={<RecordPage />} />
                     <Route path="/movements/replay/:movementId" element={<ReplayPage />} />
                     <Route path="/movements/report/:movementId" element={<ReportPage />} />
+
+                    <Route path="/progress" element={<ProgressPage />} />
 
                     {/* NEW: Settings view registration */}
                     <Route path="/settings" element={<SettingsPage />} />
