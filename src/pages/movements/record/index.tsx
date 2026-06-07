@@ -109,6 +109,15 @@ const useMovementSession = (
     const currentTimestampRef = useRef<number>(0);
 
     useEffect(() => {
+        const loadSettings = async () => {
+            const db = new DatabaseEngine();
+            const settings = await db.loadSettings();
+            detectorRef.current.updateSettings(settings);
+        };
+        loadSettings();
+    }, []);
+
+    useEffect(() => {
         if (movementId) {
             try { analyserRef.current = getAnalyserInstance(movementId); }
             catch { setMessage("Calibration not supported for this movement."); }

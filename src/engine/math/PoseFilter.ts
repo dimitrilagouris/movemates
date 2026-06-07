@@ -1,5 +1,6 @@
 import { OneEuroFilter } from './OneEuroFilter';
 import { type Landmark, type AppSettings, DEFAULT_SETTINGS } from '../db/DatabaseEngine';
+import { LANDMARK_NAMES } from '../../types/landmarks';
 
 const LANDMARK_COUNT = 33;
 
@@ -26,18 +27,42 @@ export class PoseFilter {
         }
     }
 
+    public updateSettings(settings: AppSettings): void {
+        this.settings = { ...DEFAULT_SETTINGS, ...settings };
+    }
+
     /**
      * Applies the smoothing filter to a full frame of landmarks.
      */
     public filterPose(landmarksArray: Landmark[], timestamp: number = performance.now()): Landmark[] {
         const filteredLandmarks: Landmark[] = [];
+        const useLocal = this.settings.filterMethod === 'local';
+        const localFilters = this.settings.localFilters;
 
         for (let i = 0; i < landmarksArray.length; i++) {
             const landmark = landmarksArray[i];
+            const name = LANDMARK_NAMES[i];
 
-            const filteredX = this.filters[`${i}_x`].filter(landmark.x, timestamp);
-            const filteredY = this.filters[`${i}_y`].filter(landmark.y, timestamp);
-            const filteredZ = this.filters[`${i}_z`].filter(landmark.z, timestamp);
+            let filteredX = landmark.x;
+            if (!useLocal || localFilters[`${name}_x`]) {
+                filteredX = this.filters[`${i}_x`].filter(landmark.x, timestamp);
+            } else {
+                this.filters[`${i}_x`].filter(landmark.x, timestamp); // Keep warm
+            }
+
+            let filteredY = landmark.y;
+            if (!useLocal || localFilters[`${name}_y`]) {
+                filteredY = this.filters[`${i}_y`].filter(landmark.y, timestamp);
+            } else {
+                this.filters[`${i}_y`].filter(landmark.y, timestamp); // Keep warm
+            }
+
+            let filteredZ = landmark.z;
+            if (!useLocal || localFilters[`${name}_z`]) {
+                filteredZ = this.filters[`${i}_z`].filter(landmark.z, timestamp);
+            } else {
+                this.filters[`${i}_z`].filter(landmark.z, timestamp); // Keep warm
+            }
 
             filteredLandmarks.push({
                 x: filteredX,

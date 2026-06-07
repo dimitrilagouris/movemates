@@ -1,7 +1,7 @@
 import { PoseLandmarker, FilesetResolver, type PoseLandmarkerResult } from '@mediapipe/tasks-vision';
 import type { LandmarksData } from '../../types/landmarks';
 import { PoseFilter } from '../math/PoseFilter';
-import type { Landmark } from '../db/DatabaseEngine';
+import type { Landmark, AppSettings } from '../db/DatabaseEngine';
 
 /**
  * Wraps the MediaPipe Vision API for real-time skeletal tracking.
@@ -13,6 +13,10 @@ export class MediaPipeDetector {
 
     constructor() {
         this.filter = new PoseFilter();
+    }
+
+    public updateSettings(settings: AppSettings): void {
+        this.filter.updateSettings(settings);
     }
 
     public async initialise(): Promise<void> {
