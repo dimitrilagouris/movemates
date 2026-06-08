@@ -107,3 +107,36 @@
     background-color: var(--colour-red-100);
     color: var(--colour-red-600);
 }
+
+.live-metrics-col-value--full {
+    width: 100%;
+}
+
+.live-metrics-bottom--spaced {
+    margin-top: var(--space-2);
+}
+
+.live-metrics-swing-container {
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    height: 8px;
+    margin-bottom: 4px;
+}
+
+.live-metrics-swing-segment {
+    flex: 1;
+    border-radius: 2px;
+    background-color: var(--colour-zinc-200);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.live-metrics-swing-segment--completed {
+    background-color: var(--colour-lime-500);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.live-metrics-swing-value {
+    font-size: var(--text-xs);
+    color: var(--colour-zinc-500);
+}

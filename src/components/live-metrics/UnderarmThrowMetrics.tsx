@@ -57,21 +57,19 @@ export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, 
                     <div className="live-metrics-col-header">
                         <span className="live-metrics-col-title">Swing Angle</span>
                     </div>
-                    <div className="live-metrics-col-value live-metrics-mono" style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', gap: '2px', width: '100%', height: '8px', marginBottom: '4px' }}>
+                    <div className="live-metrics-col-value live-metrics-mono live-metrics-col-value--full">
+                        <div className="live-metrics-swing-container">
                             {Array.from({ length: 10 }).map((_, i) => {
                                 const completed = i < Math.floor(parseFloat(metrics.swingAngle) / 10);
                                 return (
-                                    <div key={i} style={{
-                                        flex: 1,
-                                        backgroundColor: completed ? 'var(--colour-lime-500)' : 'var(--colour-zinc-200)',
-                                        borderRadius: '2px',
-                                        boxShadow: completed ? 'inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.05)' : 'inset 0 1px 1px rgba(0,0,0,0.05)'
-                                    }} />
+                                    <div 
+                                        key={i} 
+                                        className={`live-metrics-swing-segment ${completed ? 'live-metrics-swing-segment--completed' : ''}`}
+                                    />
                                 );
                             })}
                         </div>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--colour-zinc-500)' }}>{metrics.swingAngle}°</div>
+                        <div className="live-metrics-swing-value">{metrics.swingAngle}°</div>
                     </div>
                 </div>
                 <div className="live-metrics-col">
@@ -84,7 +82,7 @@ export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, 
                 </div>
             </div>
             
-            <div className="live-metrics-bottom" style={{ marginTop: 'var(--space-2)' }}>
+            <div className="live-metrics-bottom live-metrics-bottom--spaced">
                 <div className="live-metrics-col">
                     <div className="live-metrics-col-header">
                         <span className="live-metrics-col-title">Valid</span>

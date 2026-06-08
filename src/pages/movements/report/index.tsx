@@ -75,7 +75,7 @@ export const ReportPage = () => {
                         Assessment Report
                     </h1>
                 </div>
-                <div className="report-header__actions" style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <div className="report-header__actions">
                     <Button variant="text" onClick={() => {}}>Share</Button>
                     <Button variant="primary" className="shadow-1" onClick={() => {
                         const exporter = new ReportExporter();
@@ -85,17 +85,9 @@ export const ReportPage = () => {
             </header>
 
             <main className="report-page">
-                <div style={{ 
-                    backgroundColor: 'color-mix(in srgb, var(--colour-zinc-500) 10%, transparent)', 
-                    borderRadius: 'var(--radius-md)', 
-                    padding: 'var(--space-4)', 
-                    marginBottom: 'var(--space-6)', 
-                    display: 'flex', 
-                    alignItems: 'flex-start', 
-                    gap: 'var(--space-3)' 
-                }}>
-                    <RiAlertLine size={20} style={{ color: 'var(--colour-zinc-600)', flexShrink: 0, marginTop: '2px' }} />
-                    <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-900)', lineHeight: '1.5' }}>
+                <div className="report-disclaimer">
+                    <RiAlertLine size={20} className="report-disclaimer__icon" />
+                    <p className="report-disclaimer__text">
                         <strong>Disclaimer:</strong> This automated assessment is intended for informational purposes only. Please consult your physiotherapist or a qualified healthcare professional before making any medical decisions based on these results.
                     </p>
                 </div>
@@ -204,20 +196,20 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                 {/* Shoulder Abduction Chart */}
                 <div className="report-card report-card--chart">
                     <div className="chart-header">
-                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Shoulder Abduction</div>
+                        <div className="report-card__title report-card__title--peak">Peak Shoulder Abduction</div>
                         <div className="chart-stats-row">
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lShoulder}°</div>
+                                <div className="chart-stat-val chart-stat-val--left">{maxVals?.lShoulder}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-badge chart-stat-badge--left">Left</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rShoulder}°</div>
+                                <div className="chart-stat-val chart-stat-val--right">{maxVals?.rShoulder}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
+                                    <div className="chart-stat-badge chart-stat-badge--right">Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -229,7 +221,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span className="recharts-legend-item-text">{value}</span>} />
                             <Line type="monotone" dataKey="lShoulderAbd" name="Left Shoulder" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rShoulderAbd" name="Right Shoulder" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
@@ -239,20 +231,20 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                 {/* Hip Abduction Chart */}
                 <div className="report-card report-card--chart">
                     <div className="chart-header">
-                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Hip Abduction</div>
+                        <div className="report-card__title report-card__title--peak">Peak Hip Abduction</div>
                         <div className="chart-stats-row">
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lHip}°</div>
+                                <div className="chart-stat-val chart-stat-val--left">{maxVals?.lHip}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-badge chart-stat-badge--left">Left</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rHip}°</div>
+                                <div className="chart-stat-val chart-stat-val--right">{maxVals?.rHip}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
+                                    <div className="chart-stat-badge chart-stat-badge--right">Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -264,7 +256,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span className="recharts-legend-item-text">{value}</span>} />
                             <Line type="monotone" dataKey="lHipAbd" name="Left Hip" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rHipAbd" name="Right Hip" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
@@ -274,20 +266,20 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                 {/* Knee Valgus Chart */}
                 <div className="report-card report-card--chart" style={{ gridColumn: '1 / -1' }}>
                     <div className="chart-header">
-                        <div className="report-card__title" style={{ fontSize: '1.1rem', color: '#18181b', fontWeight: 600, marginBottom: '0.5rem' }}>Peak Knee Valgus Deviation</div>
+                        <div className="report-card__title report-card__title--peak">Peak Knee Valgus Deviation</div>
                         <div className="chart-stats-row">
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-blue-600)' }}>{maxVals?.lKnee}°</div>
+                                <div className="chart-stat-val chart-stat-val--left">{maxVals?.lKnee}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-blue-600)', backgroundColor: 'var(--colour-blue-100)' }}>Left</div>
+                                    <div className="chart-stat-badge chart-stat-badge--left">Left</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
                             <div className="chart-stat-divider"></div>
                             <div className="chart-stat-block">
-                                <div className="chart-stat-val" style={{ color: 'var(--colour-teal-600)' }}>{maxVals?.rKnee}°</div>
+                                <div className="chart-stat-val chart-stat-val--right">{maxVals?.rKnee}°</div>
                                 <div className="chart-stat-info">
-                                    <div className="chart-stat-badge" style={{ color: 'var(--colour-teal-600)', backgroundColor: 'var(--colour-teal-100)' }}>Right</div>
+                                    <div className="chart-stat-badge chart-stat-badge--right">Right</div>
                                     <div className="chart-stat-desc">Maximum degrees</div>
                                 </div>
                             </div>
@@ -299,7 +291,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span className="recharts-legend-item-text">{value}</span>} />
                             <Line type="monotone" dataKey="lKneeValgus" name="Left Knee" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rKneeValgus" name="Right Knee" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
