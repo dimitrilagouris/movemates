@@ -1,10 +1,12 @@
 import type { MovementId } from '../../types/movements';
 import type { ReportExportStrategy } from './ReportExportStrategy';
 import { OneLeggedStandExportStrategy } from './OneLeggedStandExportStrategy';
+import { UnderarmThrowExportStrategy } from './UnderarmThrowExportStrategy';
 
 export class ReportExporter {
     private strategies: Partial<Record<MovementId, ReportExportStrategy>> = {
-        'one-legged-stand': new OneLeggedStandExportStrategy()
+        'one-legged-stand': new OneLeggedStandExportStrategy(),
+        'underarm-throw': new UnderarmThrowExportStrategy()
     };
 
     /**
