@@ -300,7 +300,10 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
         }
 
         if (!this.tracker.attempt_finished) {
-            this.tracker.landmark_series.push(landmarksData); // Simplified storage
+            (this.tracker.landmark_series as any[]).push({
+                landmarks: landmarksData,
+                timestamp: timestampS
+            });
         }
 
         const validationResult = this.validateLiveTechnique(landmarksData, frameIndex);
@@ -316,7 +319,7 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
                     this.tracker.completion_timestamp = timestampS;
                     if (this.tracker.start_time !== null) {
                         this.tracker.end_time = timestampS;
-                        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100000) / 100;
+                        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100) / 100;
                     }
                 } else if (timestampS - this.tracker.completion_timestamp >= 0.5) {
                     this.tracker.attempt_finished = true;

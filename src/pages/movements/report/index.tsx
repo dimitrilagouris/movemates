@@ -14,7 +14,9 @@ import { DatabaseEngine } from '../../../engine/db';
 import { Button } from '../../../components/common/Button';
 import { StatCard } from '../../../components/common/StatCard';
 import { type OneLeggedStandTracker } from '../../../engine/movements/OneLeggedStandAnalyser';
+import { type UnderarmThrowTracker } from '../../../engine/movements/UnderarmThrowAnalyser';
 import { ReportExporter, OneLeggedStandExportStrategy } from '../../../engine/export';
+import { UnderarmThrowReport } from './UnderarmThrowReport';
 import './style.css';
 
 export const ReportPage = () => {
@@ -95,8 +97,12 @@ export const ReportPage = () => {
                 {movementId === 'one-legged-stand' && (
                     <OneLeggedStandReport tracker={latestTracker as OneLeggedStandTracker} />
                 )}
+
+                {movementId === 'underarm-throw' && (
+                    <UnderarmThrowReport tracker={latestTracker as UnderarmThrowTracker} />
+                )}
                 
-                {movementId !== 'one-legged-stand' && (
+                {movementId !== 'one-legged-stand' && movementId !== 'underarm-throw' && (
                     <div className="report-card">
                         <div className="report-card__title">Generic Report</div>
                         <div className="report-card__detail">Metrics are not configured yet for {movement.title}.</div>
