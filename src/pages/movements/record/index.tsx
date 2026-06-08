@@ -170,7 +170,7 @@ const useMovementSession = (
                         if (trackerState.attempt_finished) {
                             setIsAttemptFinished(true);
                         }
-                        if ((trackerState as any).has_started_forward_swing) {
+                        if ((trackerState as any).has_started_backward_swing) {
                             setIsAttemptStarted(true);
                         }
                     }

@@ -205,6 +205,7 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
             throw_valid: true,
             validation_messages: [],
             has_started_forward_swing: false,
+            has_started_backward_swing: false,
             completion_timestamp: null,
             armspan: 0,
             start_time: null,
@@ -437,9 +438,12 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
         
         this.tracker.prev_wrist_position = { x: wrist.x, y: wrist.y, z: wrist.z };
 
-        if (this.tracker.direction_state === 'backward' && this.tracker.isBehind) {
-            if (!this.tracker.backward_swing_peak || wrist.y < this.tracker.backward_swing_peak.y) {
-                this.tracker.backward_swing_peak = { x: wrist.x, y: wrist.y, z: wrist.z };
+        if (this.tracker.direction_state === 'backward') {
+            this.tracker.has_started_backward_swing = true;
+            if (this.tracker.isBehind) {
+                if (!this.tracker.backward_swing_peak || wrist.y < this.tracker.backward_swing_peak.y) {
+                    this.tracker.backward_swing_peak = { x: wrist.x, y: wrist.y, z: wrist.z };
+                }
             }
         }
 
