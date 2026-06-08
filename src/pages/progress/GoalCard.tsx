@@ -125,7 +125,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onChange }) => {
             </div>
             <div style={{ 
                 alignSelf: 'flex-end', 
-                fontSize: '10px', 
+                fontSize: 'var(--text-xxs)', 
                 fontFamily: 'var(--font-mono, monospace)', 
                 color: 'oklch(0.5 0 0)', 
                 paddingTop: '6px',

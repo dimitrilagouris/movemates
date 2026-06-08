@@ -12,7 +12,7 @@
 
 /* Header & Typography */
 .settings-header h1 {
-    font-size: 28px;
+    font-size: var(--text-3xl);
     font-weight: 700;
     margin-bottom: var(--space-6);
     letter-spacing: -0.02em;
@@ -98,7 +98,7 @@
 }
 
 .settings-section__title {
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-weight: 600;
     padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--colour-zinc-100);

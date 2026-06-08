@@ -51,7 +51,7 @@ export const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ settings, onClos
 
                 {/* Notes Block */}
                 <div className="report-notes" style={{ backgroundColor: 'var(--colour-zinc-50)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--space-8)' }}>
-                    <div className="report-notes__label" style={{ fontSize: '13px', color: 'var(--colour-zinc-500)', marginBottom: 'var(--space-2)', fontWeight: 500 }}>Notes:</div>
+                    <div className="report-notes__label" style={{ fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-500)', marginBottom: 'var(--space-2)', fontWeight: 500 }}>Notes:</div>
                     <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-900)', lineHeight: 1.5 }}>
                         {notes}
                     </p>
@@ -62,7 +62,7 @@ export const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ settings, onClos
                     <div className="report-meta__row" style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
                         <span className="report-meta__label" style={{ fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-500)' }}>Physiotherapist</span>
                         <div className="report-meta__value" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--colour-zinc-900)', fontWeight: 500 }}>
-                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--colour-zinc-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
+                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--colour-zinc-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xxs)' }}>
                                 {physio.charAt(0).toUpperCase()}
                             </div>
                             {physio}

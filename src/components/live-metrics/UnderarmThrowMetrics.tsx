@@ -71,7 +71,7 @@ export const UnderarmThrowMetrics: React.FC<LiveMetricsProps> = ({ analyserRef, 
                                 );
                             })}
                         </div>
-                        <div style={{ fontSize: '12px', color: 'var(--colour-zinc-500)' }}>{metrics.swingAngle}°</div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--colour-zinc-500)' }}>{metrics.swingAngle}°</div>
                     </div>
                 </div>
                 <div className="live-metrics-col">

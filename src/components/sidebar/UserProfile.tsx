@@ -26,7 +26,7 @@ export const UserProfile = () => {
                 backgroundColor: 'var(--colour-zinc-200)', 
                 color: 'var(--colour-zinc-700)', 
                 fontWeight: 600,
-                fontSize: '14px',
+                fontSize: 'var(--text-sm)',
                 borderRadius: '50%'
             }}>
                 {initial}

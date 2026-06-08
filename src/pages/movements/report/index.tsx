@@ -229,7 +229,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lShoulderAbd" name="Left Shoulder" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rShoulderAbd" name="Right Shoulder" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
@@ -264,7 +264,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lHipAbd" name="Left Hip" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rHipAbd" name="Right Hip" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
@@ -299,7 +299,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={false} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 2 }} />
-                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: '13px', marginLeft: '4px' }}>{value}</span>} />
+                            <Legend iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '20px' }} formatter={(value) => <span style={{ color: '#71717a', fontSize: 'var(--text-sm)', marginLeft: '4px' }}>{value}</span>} />
                             <Line type="monotone" dataKey="lKneeValgus" name="Left Knee" stroke="var(--colour-blue-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-blue-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-blue-500) 40%, transparent))' }} />
                             <Line type="monotone" dataKey="rKneeValgus" name="Right Knee" stroke="var(--colour-teal-500)" strokeWidth={2} dot={false} activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--colour-teal-500)' }} style={{ filter: 'drop-shadow(0px 4px 6px color-mix(in srgb, var(--colour-teal-500) 40%, transparent))' }} />
                         </LineChart>
