@@ -5,6 +5,7 @@ import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
 import { DatabaseEngine } from '../../../engine/db';
 import { Button } from '../../../components/common/Button';
+import { Breadcrumbs } from '../../../components/common/Breadcrumbs';
 import './style.css';
 
 /**
@@ -90,13 +91,11 @@ export const ReplayPage = () => {
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
-                <Button
-                    variant="text"
-                    onClick={() => navigate(`/movements/record/${movementId}`)}
-                    className="learn-back-btn"
-                >
-                    <RiArrowLeftLine /> Back to Record
-                </Button>
+                <Breadcrumbs items={[
+                    { label: movement.title, path: `/movements/learn/${movementId}` },
+                    { label: 'Record', path: `/movements/record/${movementId}` },
+                    { label: 'Replay' }
+                ]} />
             </div>
 
             <header className="learn-page__header">
