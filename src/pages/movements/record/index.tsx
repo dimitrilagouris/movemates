@@ -4,9 +4,12 @@ import {
     RiArrowLeftLine,
     RiPlayCircleLine,
     RiStopCircleLine,
-    RiRestartLine
+    RiRestartLine,
+    RiRunLine,
+    RiCameraLensLine
 } from "react-icons/ri";
 import { MOVEMENTS } from '../../../config/movements';
+import { Breadcrumbs } from '../../../components/common/Breadcrumbs';
 import { type MovementId, type Movement } from '../../../types/movements';
 import { VideoPlayer } from '../../../components/VideoPlayer';
 import { MediaPipeDetector } from '../../../engine/mediapipe/detector';
@@ -170,7 +173,7 @@ const useMovementSession = (
                         if (trackerState.attempt_finished) {
                             setIsAttemptFinished(true);
                         }
-                        if ((trackerState as any).has_started_forward_swing) {
+                        if ((trackerState as any).has_started_backward_swing) {
                             setIsAttemptStarted(true);
                         }
                     }
@@ -345,13 +348,10 @@ export const RecordPage = () => {
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
-                <Button
-                    variant="text"
-                    onClick={() => navigate(`/movements/learn/${movementId}`)}
-                    className="learn-back-btn"
-                >
-                    <RiArrowLeftLine /> Back
-                </Button>
+                <Breadcrumbs items={[
+                    { label: movement.title, path: `/movements/learn/${movementId}` },
+                    { label: 'Record', icon: <RiCameraLensLine /> }
+                ]} />
             </div>
 
             <header className="learn-page__header">

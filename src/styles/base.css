@@ -4,6 +4,7 @@
     --font-sans: "Mona Sans", sans-serif;
     --font-mono: 'Geist Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace;
 
+    --text-xxs: 10px;
     --text-xs: 12px;
     --text-sm: 14px;
     --text-base: 16px;
@@ -11,6 +12,7 @@
     --text-xl: 20px;
     --text-2xl: 24px;
     --text-3xl: 30px;
+    --text-4xl: 36px;
 
     --font-weight-regular: 400;
     --font-weight-medium: 500;

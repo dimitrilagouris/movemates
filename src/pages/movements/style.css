@@ -31,3 +31,11 @@
     gap: var(--space-6);
     align-items: start;
 }
+
+.movements-disclaimer {
+    margin-top: var(--space-12);
+    text-align: center;
+    color: var(--colour-zinc-500);
+    font-size: var(--text-sm);
+    padding: 0 var(--space-4);
+}

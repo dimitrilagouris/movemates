@@ -19,16 +19,7 @@ export const UserProfile = () => {
 
     return (
         <div className="user-profile">
-            <div className="user-profile__avatar" style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                backgroundColor: 'var(--colour-zinc-200)', 
-                color: 'var(--colour-zinc-700)', 
-                fontWeight: 600,
-                fontSize: '14px',
-                borderRadius: '50%'
-            }}>
+            <div className="user-profile__avatar">
                 {initial}
             </div>
             <div className="user-profile__info">

@@ -4,11 +4,14 @@ import {
     RiArrowLeftLine,
     RiPlayFill,
     RiUploadCloud2Line,
-    RiCheckLine
+    RiCheckLine,
+    RiRunLine
 } from "react-icons/ri";
+import { DatabaseEngine } from '../../../utils/database';
 import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
-import { DatabaseEngine } from '../../../engine/db';
+import { Button } from '../../../components/common/Button';
+import { Breadcrumbs } from '../../../components/common/Breadcrumbs';
 import './style.css';
 
 /**
@@ -136,9 +139,7 @@ export const LearnPage = (): JSX.Element => {
     return (
         <div className="learn-page">
             <div className="learn-page__nav">
-                <button onClick={() => navigate('/movements')} className="learn-back-btn">
-                    <RiArrowLeftLine /> Back
-                </button>
+                <Breadcrumbs items={[{ label: movement.title }]} />
             </div>
 
             <header className="learn-page__header">

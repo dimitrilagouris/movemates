@@ -53,3 +53,56 @@ export function getKneeValgus(hip: Landmark, knee: Landmark, ankle: Landmark): n
     const angle = calculate2DAngle(hip, knee, ankle);
     return Math.round(Math.abs(180 - angle) * 100) / 100;
 }
+
+export function getSagittalAngle(shoulder: Landmark, elbow: Landmark, hip: Landmark): number {
+    // Project onto YZ plane
+    const vArm = { x: 0, y: elbow.y - shoulder.y, z: elbow.z - shoulder.z };
+    const vTrunk = { x: 0, y: hip.y - shoulder.y, z: hip.z - shoulder.z };
+
+    const dot = vArm.y * vTrunk.y + vArm.z * vTrunk.z;
+    const magArm = Math.sqrt(vArm.y * vArm.y + vArm.z * vArm.z);
+    const magTrunk = Math.sqrt(vTrunk.y * vTrunk.y + vTrunk.z * vTrunk.z);
+
+    if (magArm === 0 || magTrunk === 0) return 0;
+    
+    let cosine = dot / (magArm * magTrunk);
+    cosine = Math.max(-1, Math.min(1, cosine));
+    return Math.round(Math.acos(cosine) * (180 / Math.PI) * 100) / 100;
+}
+
+export function getCoronalAngle(shoulder: Landmark, elbow: Landmark, hip: Landmark): number {
+    // Project onto XY plane
+    const vArm = { x: elbow.x - shoulder.x, y: elbow.y - shoulder.y, z: 0 };
+    const vTrunk = { x: hip.x - shoulder.x, y: hip.y - shoulder.y, z: 0 };
+
+    const dot = vArm.x * vTrunk.x + vArm.y * vTrunk.y;
+    const magArm = Math.sqrt(vArm.x * vArm.x + vArm.y * vArm.y);
+    const magTrunk = Math.sqrt(vTrunk.x * vTrunk.x + vTrunk.y * vTrunk.y);
+
+    if (magArm === 0 || magTrunk === 0) return 0;
+    
+    let cosine = dot / (magArm * magTrunk);
+    cosine = Math.max(-1, Math.min(1, cosine));
+    return Math.round(Math.acos(cosine) * (180 / Math.PI) * 100) / 100;
+}
+
+export function getTransverseAngle(leftLandmark: Landmark, rightLandmark: Landmark): number {
+    // XZ plane. E.g. left shoulder to right shoulder.
+    const dx = rightLandmark.x - leftLandmark.x;
+    const dz = rightLandmark.z - leftLandmark.z;
+    
+    let angle = Math.atan2(dz, dx) * (180 / Math.PI);
+    return Math.round(angle * 100) / 100;
+}
+
+export function getKneeFlexion(hip: Landmark, knee: Landmark, ankle: Landmark): number {
+    // 3D angle between Hip-Knee and Ankle-Knee.
+    const angle = calculate3DAngle(hip, knee, ankle);
+    return Math.round(Math.abs(180 - angle) * 100) / 100;
+}
+
+export function calculateVelocity(currentVal: number, previousVal: number, dtSeconds: number): number {
+    if (dtSeconds <= 0) return 0;
+    const velocity = (currentVal - previousVal) / dtSeconds;
+    return Math.round(velocity * 100) / 100;
+}

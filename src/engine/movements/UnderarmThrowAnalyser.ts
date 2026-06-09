@@ -205,6 +205,7 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
             throw_valid: true,
             validation_messages: [],
             has_started_forward_swing: false,
+            has_started_backward_swing: false,
             completion_timestamp: null,
             armspan: 0,
             start_time: null,
@@ -299,7 +300,10 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
         }
 
         if (!this.tracker.attempt_finished) {
-            this.tracker.landmark_series.push(landmarksData); // Simplified storage
+            (this.tracker.landmark_series as any[]).push({
+                landmarks: landmarksData,
+                timestamp: timestampS
+            });
         }
 
         const validationResult = this.validateLiveTechnique(landmarksData, frameIndex);
@@ -315,7 +319,7 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
                     this.tracker.completion_timestamp = timestampS;
                     if (this.tracker.start_time !== null) {
                         this.tracker.end_time = timestampS;
-                        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100000) / 100;
+                        this.tracker.duration = Math.round((this.tracker.end_time - this.tracker.start_time) * 100) / 100;
                     }
                 } else if (timestampS - this.tracker.completion_timestamp >= 0.5) {
                     this.tracker.attempt_finished = true;
@@ -437,9 +441,12 @@ export class UnderarmThrowAnalyser implements MovementAnalyser<UnderarmThrowTrac
         
         this.tracker.prev_wrist_position = { x: wrist.x, y: wrist.y, z: wrist.z };
 
-        if (this.tracker.direction_state === 'backward' && this.tracker.isBehind) {
-            if (!this.tracker.backward_swing_peak || wrist.y < this.tracker.backward_swing_peak.y) {
-                this.tracker.backward_swing_peak = { x: wrist.x, y: wrist.y, z: wrist.z };
+        if (this.tracker.direction_state === 'backward') {
+            this.tracker.has_started_backward_swing = true;
+            if (this.tracker.isBehind) {
+                if (!this.tracker.backward_swing_peak || wrist.y < this.tracker.backward_swing_peak.y) {
+                    this.tracker.backward_swing_peak = { x: wrist.x, y: wrist.y, z: wrist.z };
+                }
             }
         }
 

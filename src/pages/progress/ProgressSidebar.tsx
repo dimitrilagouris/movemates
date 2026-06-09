@@ -58,9 +58,9 @@ export const ProgressSidebar: React.FC<ProgressSidebarProps> = ({ report, userNa
                 </div>
 
                 <div className="report-actions">
-                    <Button variant="secondary" size="small" style={{ flex: 1 }}>View Full</Button>
-                    <Button variant="secondary" size="small" style={{ flex: 1 }}>Compare</Button>
-                    <Button variant="secondary" size="small" style={{ flex: 1 }}>Delete</Button>
+                    <Button variant="secondary" size="small">View Full</Button>
+                    <Button variant="secondary" size="small">Compare</Button>
+                    <Button variant="secondary" size="small">Delete</Button>
                 </div>
 
                 <div className="report-meta">

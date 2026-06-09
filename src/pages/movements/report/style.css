@@ -43,6 +43,7 @@
 
 .report-card--chart {
     height: 400px;
+    border: none;
 }
 
 .report-card__title {
@@ -143,7 +144,7 @@
     height: 28px;
     border-radius: var(--radius-md);
     color: var(--colour-zinc-500);
-    font-size: 16px;
+    font-size: var(--text-base);
 }
 
 .stat-card__title {
@@ -153,7 +154,7 @@
 }
 
 .stat-card__value {
-    font-size: 24px;
+    font-size: var(--text-2xl);
     color: var(--colour-zinc-900);
     font-weight: 600;
     font-family: var(--font-sans);
@@ -208,7 +209,7 @@
 }
 
 .chart-stat-val {
-    font-size: 24px;
+    font-size: var(--text-2xl);
     font-weight: 600;
     line-height: 1;
     font-family: var(--font-mono);
@@ -225,7 +226,7 @@
     align-items: center;
     padding: 2px 6px;
     border-radius: var(--radius-sm);
-    font-size: 11px;
+    font-size: var(--text-xxs);
     font-weight: 700;
     text-transform: uppercase;
     width: max-content;
@@ -234,4 +235,67 @@
 .chart-stat-desc {
     font-size: var(--text-sm);
     color: var(--colour-zinc-500);
+}
+
+.chart-stat-val--left {
+    color: var(--colour-blue-600);
+}
+
+.chart-stat-badge--left {
+    color: var(--colour-blue-600);
+    background-color: var(--colour-blue-100);
+}
+
+.chart-stat-val--right {
+    color: var(--colour-teal-600);
+}
+
+.chart-stat-badge--right {
+    color: var(--colour-teal-600);
+    background-color: var(--colour-teal-100);
+}
+
+/* Report Header Additions */
+.report-header__actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* Report Disclaimer Additions */
+.report-disclaimer {
+    background-color: color-mix(in srgb, var(--colour-zinc-500) 10%, transparent);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.report-disclaimer__icon {
+    color: var(--colour-zinc-600);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.report-disclaimer__text {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--colour-zinc-900);
+    line-height: 1.5;
+}
+
+/* Generic title fixes */
+.report-card__title--peak {
+    font-size: 1.1rem;
+    color: var(--colour-zinc-900);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Recharts Legend Formatter Text */
+.recharts-legend-item-text {
+    color: var(--colour-zinc-500);
+    font-size: var(--text-sm);
+    margin-left: 4px;
 }
