@@ -7,11 +7,12 @@ import {
     RiCheckLine,
     RiRunLine
 } from "react-icons/ri";
-import { DatabaseEngine } from '../../../utils/database';
+import { DatabaseEngine } from '../../../engine/db';
 import { MOVEMENTS } from '../../../config/movements';
 import { type MovementId, type Movement } from '../../../types/movements';
 import { Button } from '../../../components/common/Button';
 import { Breadcrumbs } from '../../../components/common/Breadcrumbs';
+import { UploadEmptyState } from '../../../components/common/UploadEmptyState';
 import './style.css';
 
 /**
@@ -75,14 +76,14 @@ const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }): JS
     }
 
     return (
-        <div className="video-content cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-            <div className="video-icon-circle video-icon-circle--faint">
-                {isUploading ? <RiUploadCloud2Line size={32} className="animate-pulse" /> : <RiUploadCloud2Line size={32} />}
-            </div>
-            <p>
-                <strong>{isUploading ? "Saving..." : "Upload your attempt"}</strong>
-                {!isUploading && " for analysis"}
-            </p>
+        <>
+            <UploadEmptyState
+                title="Upload your attempt"
+                description="Upload a video of your movement for AI analysis."
+                buttonText="Select Video"
+                isLoading={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+            />
             <input
                 type="file"
                 accept="video/*"
@@ -91,7 +92,7 @@ const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }): JS
                 onChange={handleFileChange}
                 onClick={(e) => e.stopPropagation()}
             />
-        </div>
+        </>
     );
 };
 
