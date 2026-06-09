@@ -88,7 +88,7 @@ export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker
 
             <div className="report-charts-row">
                 {/* Shoulder Flexion Chart */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Shoulder Flexion/Extension</div>
                         <div className="chart-stats-row">
@@ -123,7 +123,7 @@ export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker
                 </div>
 
                 {/* Shoulder Abduction Chart */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Shoulder Abduction/Adduction</div>
                         <div className="chart-stats-row">
@@ -158,7 +158,7 @@ export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker
                 </div>
 
                 {/* Rotations */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Transverse Rotation</div>
                         <div className="chart-stats-row">
@@ -193,7 +193,7 @@ export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker
                 </div>
 
                 {/* Knee Velocity */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Knee Flexion Velocity</div>
                         <div className="chart-stats-row">
@@ -228,7 +228,7 @@ export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker
                 </div>
 
                 {/* Trunk Velocity */}
-                <div className="report-card report-card--chart" style={{ gridColumn: '1 / -1' }}>
+                <div className="report-card report-card--chart shadow-1" style={{ gridColumn: '1 / -1' }}>
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Trunk Rotation Velocity</div>
                         <div className="chart-stats-row">

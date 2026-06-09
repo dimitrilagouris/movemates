@@ -200,7 +200,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
 
             <div className="report-charts-row">
                 {/* Shoulder Abduction Chart */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Peak Shoulder Abduction</div>
                         <div className="chart-stats-row">
@@ -235,7 +235,7 @@ const OneLeggedStandReport = ({ tracker }: { tracker: OneLeggedStandTracker }) =
                 </div>
 
                 {/* Hip Abduction Chart */}
-                <div className="report-card report-card--chart">
+                <div className="report-card report-card--chart shadow-1">
                     <div className="chart-header">
                         <div className="report-card__title report-card__title--peak">Peak Hip Abduction</div>
                         <div className="chart-stats-row">
