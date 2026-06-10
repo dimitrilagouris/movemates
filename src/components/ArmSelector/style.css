@@ -1,0 +1,104 @@
+.arm-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+}
+
+.arm-selector__svg {
+    width: 160px;
+    height: auto;
+    user-select: none;
+}
+
+/* ---- Body (non-interactive parts) ---- */
+
+.body-fill {
+    fill: var(--colour-grey-300);
+    stroke: none;
+}
+
+.body-stroke {
+    fill: none;
+    stroke: var(--colour-grey-300);
+}
+
+/* ---- Arms (interactive) ---- */
+
+.arm-group {
+    cursor: pointer;
+}
+
+.arm-hit-area {
+    fill: transparent;
+    stroke: none;
+}
+
+.arm-part {
+    fill: none;
+    stroke: var(--colour-grey-300);
+    transition: stroke 0.25s ease, fill 0.25s ease, filter 0.25s ease;
+}
+
+.arm-fill {
+    fill: var(--colour-grey-300);
+    stroke: none;
+}
+
+.arm-group:hover .arm-part {
+    stroke: var(--colour-grey-400);
+}
+
+.arm-group:hover .arm-fill {
+    fill: var(--colour-grey-400);
+}
+
+.arm-group--active .arm-part {
+    stroke: var(--colour-lime-400);
+    filter: drop-shadow(0 0 6px var(--colour-lime-400));
+}
+
+.arm-group--active .arm-fill {
+    fill: var(--colour-lime-400);
+    filter: drop-shadow(0 0 6px var(--colour-lime-400));
+}
+
+.arm-group--active:hover .arm-part {
+    stroke: var(--colour-lime-400);
+}
+
+.arm-group--active:hover .arm-fill {
+    fill: var(--colour-lime-400);
+}
+
+/* ---- Labels ---- */
+
+.arm-selector__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    fill: var(--colour-grey-400);
+    text-anchor: middle;
+    transition: fill 0.25s ease;
+}
+
+.arm-group--active .arm-selector__label {
+    fill: var(--colour-lime-500);
+}
+
+/* ---- Footer ---- */
+
+.arm-selector__footer {
+    text-align: center;
+}
+
+.arm-selector__active-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--colour-lime-500);
+    font-weight: 600;
+}

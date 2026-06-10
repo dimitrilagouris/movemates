@@ -16,6 +16,7 @@ import { LocalGridPanel } from './LocalGridPanel';
 import { TextInput } from '../../components/common/TextInput';
 import { SelectInput } from '../../components/common/SelectInput';
 import { Toast } from '../../components/common/Toast';
+import { ArmSelector } from '../../components/ArmSelector';
 import './style.css';
 
 // --- Pure UI Components ---
@@ -314,16 +315,12 @@ const MovementsSection = ({ settings, onChange }: { settings: AppSettings, onCha
         />
 
         <div className="settings-control-grid">
-            <div className="settings-control-card">
+            <div className="settings-control-card settings-control-card--body-selector shadow-1">
                 <span className="settings-control-card__title">Target Throwing Arm</span>
-                <span className="settings-control-card__description">Which arm the engine monitors for the release angle.</span>
-                <ToggleTabs
-                    activeId={settings.throwingArm}
-                    onChange={(id) => onChange('throwingArm', id)}
-                    options={[
-                        { id: 'Left', label: 'Left Arm' },
-                        { id: 'Right', label: 'Right Arm' }
-                    ]}
+                <span className="settings-control-card__description">Select the arm the engine monitors for the release angle.</span>
+                <ArmSelector
+                    activeArm={settings.throwingArm as 'Left' | 'Right'}
+                    onChange={(arm) => onChange('throwingArm', arm)}
                 />
             </div>
 
@@ -371,7 +368,7 @@ const DataManagementSection = ({
                 </div>
             </div>
 
-            <div className="settings-data-list">
+            <div className="settings-data-list shadow-1">
                 <div className="settings-data-list__item">
                     <div className="settings-data-list__item-left">
                         <div className="settings-data-list__item-icon">

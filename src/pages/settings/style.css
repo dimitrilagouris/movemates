@@ -261,7 +261,6 @@
 
 .settings-control-card {
     background-color: var(--colour-white);
-    border: 1px solid var(--colour-grey-200);
     border-radius: var(--radius-xl);
     padding: var(--space-5) var(--space-6);
     display: flex;
@@ -279,6 +278,11 @@
     font-size: var(--text-sm);
     color: var(--colour-grey-500);
     line-height: 1.5;
+}
+
+.settings-control-card--body-selector {
+    align-items: center;
+    text-align: center;
 }
 
 /* ==========================================================================
@@ -390,7 +394,6 @@
 }
 
 .settings-data-list {
-    border: 1px solid var(--colour-grey-200);
     border-radius: var(--radius-xl);
     background-color: var(--colour-white);
     overflow: hidden;
