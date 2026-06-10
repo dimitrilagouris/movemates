@@ -3,7 +3,7 @@
     bottom: var(--space-6);
     right: var(--space-6);
     width: 400px;
-    background-color: var(--colour-grey-900);
+    background-color: var(--colour-zinc-900);
     border-radius: var(--radius-md);
     overflow: hidden;
     z-index: 50;
@@ -54,7 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--colour-slate-500);
+    color: var(--colour-grey-500);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -65,12 +65,12 @@
 }
 
 .toast-close:hover {
-    color: var(--colour-slate-300);
+    color: var(--colour-grey-300);
 }
 
 .toast-message {
     font-size: var(--text-sm);
-    color: var(--colour-slate-400);
+    color: var(--colour-grey-400);
     margin: 0;
     margin-bottom: var(--space-3);
     line-height: 1.5;
@@ -84,7 +84,7 @@
 
 .toast-progress {
     height: 4px;
-    background-color: var(--colour-slate-500);
+    background-color: var(--colour-grey-500);
     width: 100%;
     transform-origin: left;
     animation: toast-progress-shrink linear forwards;

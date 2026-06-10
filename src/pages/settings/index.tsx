@@ -65,18 +65,20 @@ interface SliderCardProps {
     step: number;
     lowLabel: string;
     highLabel: string;
+    description: string;
     formatValue?: (v: number) => string;
     onChange: (value: number) => void;
 }
 
 const SliderCard = ({
     title, value, min, max, step,
-    lowLabel, highLabel, formatValue, onChange
+    lowLabel, highLabel, description, formatValue, onChange
 }: SliderCardProps): JSX.Element => {
     const displayValue = formatValue ? formatValue(value) : String(value);
 
     return (
-        <div className="settings-slider-card">
+        <div className="settings-slider-card-wrapper">
+            <div className="settings-slider-card shadow-1">
             <div className="settings-slider-card__header">
                 <span className="settings-slider-card__title">{title}</span>
                 <div className="settings-slider-card__info-icon">
@@ -94,16 +96,14 @@ const SliderCard = ({
 
             <div className="settings-slider-card__labels">
                 <span className="settings-slider-card__label">{lowLabel}</span>
-                <span className="settings-slider-card__value">{displayValue}</span>
+                <span className="settings-slider-card__value shadow-1">{displayValue}</span>
                 <span className="settings-slider-card__label">{highLabel}</span>
             </div>
 
+            </div>
+
             <div className="settings-slider-card__footer">
-                <div className="settings-slider-card__footer-left">
-                    <RiSparklingLine size={14} />
-                    <span>AI Suggestions</span>
-                </div>
-                <RiArrowRightSLine size={16} />
+                {description}
             </div>
         </div>
     );
@@ -271,6 +271,7 @@ const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, o
                     step={0.1}
                     lowLabel="SMOOTH"
                     highLabel="RESPONSIVE"
+                    description="Controls the base responsiveness to movement."
                     formatValue={(v) => v.toFixed(1)}
                     onChange={(v) => onChange('mincutoff', v)}
                 />
@@ -282,6 +283,7 @@ const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, o
                     step={0.0001}
                     lowLabel="SLOW"
                     highLabel="FAST"
+                    description="Adjusts how the system reacts to sudden movements."
                     formatValue={(v) => v.toFixed(4)}
                     onChange={(v) => onChange('beta_', v)}
                 />
@@ -295,6 +297,7 @@ const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, o
                     step={0.1}
                     lowLabel="STRICT"
                     highLabel="LOOSE"
+                    description="Filters out shaky movements when you move fast."
                     formatValue={(v) => v.toFixed(1)}
                     onChange={(v) => onChange('dcutoff', v)}
                 />
@@ -332,6 +335,7 @@ const MovementsSection = ({ settings, onChange }: { settings: AppSettings, onCha
                 step={1}
                 lowLabel="NARROW"
                 highLabel="WIDE"
+                description="The required arm swing angle to trigger a valid throw."
                 formatValue={(v) => `${v}°`}
                 onChange={(v) => onChange('swingAngle', v)}
             />
@@ -354,44 +358,20 @@ const DataManagementSection = ({
             <div className="settings-data-left">
                 <h3>Data Management</h3>
                 <p>Import, export, or reset your configuration.</p>
-                <div className="settings-data-actions">
+                <div className="settings-data-actions" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                     <Button variant="primary" className="shadow-1" onClick={onExport}>
                         <RiDownloadFill /> Export Settings
+                    </Button>
+                    <Button onClick={onImportClick} style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--colour-slate-900)', boxShadow: 'none' }}>
+                        <RiUploadCloud2Line /> Import Settings
+                    </Button>
+                    <Button onClick={onReset} style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--colour-red-600)', boxShadow: 'none' }}>
+                        <RiRestartLine /> Reset to Defaults
                     </Button>
                 </div>
             </div>
 
             <div className="settings-data-list">
-                <div className="settings-data-list__item">
-                    <div className="settings-data-list__item-left">
-                        <div className="settings-data-list__item-icon">
-                            <RiUploadCloud2Line size={16} />
-                        </div>
-                        Import Settings
-                    </div>
-                    <button
-                        className="settings-data-list__item-action settings-data-list__item-action--default"
-                        onClick={onImportClick}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
-                    >
-                        <RiAddLine size={14} /> Import
-                    </button>
-                </div>
-                <div className="settings-data-list__item">
-                    <div className="settings-data-list__item-left">
-                        <div className="settings-data-list__item-icon">
-                            <RiDeleteBinLine size={16} />
-                        </div>
-                        Reset to Defaults
-                    </div>
-                    <button
-                        className="settings-data-list__item-action settings-data-list__item-action--default"
-                        onClick={onReset}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
-                    >
-                        <RiRestartLine size={14} /> Reset
-                    </button>
-                </div>
                 <div className="settings-data-list__item">
                     <div className="settings-data-list__item-left">
                         <div className="settings-data-list__item-icon">
@@ -556,6 +536,8 @@ export const SettingsPage = (): JSX.Element => {
                     </div>
                 </header>
 
+                <hr className="settings-divider" />
+
                 <main>
                     {showUnsavedToast && (
                         <Toast
@@ -566,7 +548,7 @@ export const SettingsPage = (): JSX.Element => {
                                 <>
                                     <button 
                                         onClick={() => setShowUnsavedToast(false)} 
-                                        style={{ background: 'none', border: 'none', color: 'var(--colour-slate-400)', fontWeight: 500, padding: 0, cursor: 'pointer', fontSize: 'var(--text-sm)' }}
+                                        style={{ background: 'none', border: 'none', color: 'var(--colour-grey-400)', fontWeight: 500, padding: 0, cursor: 'pointer', fontSize: 'var(--text-sm)' }}
                                     >
                                         Dismiss
                                     </button>
