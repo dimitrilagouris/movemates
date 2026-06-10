@@ -24,7 +24,7 @@ const buildJointData = (frames: any[], duration: number): TimeSeriesPoint[] => {
 
 // --- UI Sub-Components ---
 
-const MetricCard = ({ title, value, unit }: { title: string, value: number, unit: string }): JSX.Element => (
+const MetricCard = ({ title, value, unit }: { title: string, value: number, unit: string }) => (
     <div className="report-card shadow-1">
         <h4 className="report-card__title">{title}</h4>
         <div className="report-card__value">
@@ -33,7 +33,7 @@ const MetricCard = ({ title, value, unit }: { title: string, value: number, unit
     </div>
 );
 
-const SwaySummaryGrid = ({ metrics }: { metrics: OneLeggedReportData['swayMetrics'] }): JSX.Element => (
+const SwaySummaryGrid = ({ metrics }: { metrics: OneLeggedReportData['swayMetrics'] }) => (
     <section className="report-section">
         <h3 className="report-section__header">Instability Metrics (Sway Frequency)</h3>
         <div className="report-grid">
@@ -44,7 +44,7 @@ const SwaySummaryGrid = ({ metrics }: { metrics: OneLeggedReportData['swayMetric
     </section>
 );
 
-const TimeSeriesChart = ({ data, lines, yLabel }: { data: TimeSeriesPoint[], lines: { key: string, colour: string }[], yLabel: string }): JSX.Element => (
+const TimeSeriesChart = ({ data, lines, yLabel }: { data: TimeSeriesPoint[], lines: { key: string, colour: string }[], yLabel: string }) => (
     <div className="chart-container shadow-1">
         <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -71,7 +71,7 @@ const TimeSeriesChart = ({ data, lines, yLabel }: { data: TimeSeriesPoint[], lin
 
 // --- Main Report Component ---
 
-export const OneLeggedStandReport = ({ reportData }: { reportData: OneLeggedReportData }): JSX.Element => {
+export const OneLeggedStandReport = ({ reportData }: { reportData: OneLeggedReportData }) => {
     const { duration } = reportData.meta;
 
     const armSpanData = buildArmSpanData(reportData.armSpanPercents, duration);

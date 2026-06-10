@@ -30,7 +30,7 @@ export const UploadEmptyState = ({
     loadingButtonText = "Saving...",
     onClick,
     className = ""
-}: UploadEmptyStateProps): JSX.Element => {
+}: UploadEmptyStateProps) => {
     return (
         <div className={`upload-empty-state ${className}`} onClick={onClick}>
             <div className="empty-state-content">

@@ -14,7 +14,7 @@ import './style.css';
 import { SidebarItem } from './SidebarItem';
 import { UserProfile } from './UserProfile';
 
-export const Sidebar = (): JSX.Element => {
+export const Sidebar = () => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const location = useLocation();
     const navigate = useNavigate();

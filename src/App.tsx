@@ -13,7 +13,7 @@ import './styles/base.css';
 import './styles/buttons.css';
 import './App.css';
 
-function App(): JSX.Element {
+function App() {
     return (
         <div className="app">
             <Sidebar />

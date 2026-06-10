@@ -28,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker }): JSX.Element => {
+export const UnderarmThrowReport = ({ tracker }: { tracker: UnderarmThrowTracker }) => {
     
     const chartData = useMemo(() => {
         return UnderarmThrowExportStrategy.generateChartData(tracker);

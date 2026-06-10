@@ -25,7 +25,7 @@ export const Button = ({
                            className = '',
                            children,
                            ...props
-                       }: ButtonProps): JSX.Element => {
+                       }: ButtonProps) => {
 
     // Dynamically construct the class list based on props
     const classes = [

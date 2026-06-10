@@ -18,7 +18,7 @@ export const Toast = ({
     action,
     duration,
     onClose
-}: ToastProps): JSX.Element => {
+}: ToastProps) => {
     useEffect(() => {
         if (duration !== undefined && duration > 0) {
             const timerId: NodeJS.Timeout = setTimeout(() => {

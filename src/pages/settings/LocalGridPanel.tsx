@@ -9,7 +9,7 @@ interface LocalGridPanelProps {
 export const LocalGridPanel = ({
     selected,
     toggleSelection
-}: LocalGridPanelProps): JSX.Element => {
+}: LocalGridPanelProps) => {
     const handleRowSelect = (landmark: string): void => {
         ['x', 'y', 'z'].forEach(axis => toggleSelection(`${landmark}_${axis}`));
     };

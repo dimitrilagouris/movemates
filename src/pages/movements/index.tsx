@@ -9,7 +9,7 @@ import { DatabaseEngine } from '../../engine/db/DatabaseEngine';
 /**
  * Renders the main dashboard grid for movement selection.
  */
-export const MovementsPage = (): JSX.Element => {
+export const MovementsPage = () => {
     const navigate = useNavigate();
     const [firstName, setFirstName] = useState<string>('');
     const dbRef = useRef(new DatabaseEngine());

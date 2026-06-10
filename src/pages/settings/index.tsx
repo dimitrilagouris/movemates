@@ -27,7 +27,7 @@ interface SectionHeaderProps {
 }
 
 /** Free-flowing section header with optional right-aligned action. */
-const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps): JSX.Element => (
+const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
     <div className="settings-section__header">
         <div className="settings-section__header-text">
             <h3>{title}</h3>
@@ -43,7 +43,7 @@ interface SettingRowProps {
     children: ReactNode;
 }
 
-const SettingRow = ({ title, description, children }: SettingRowProps): JSX.Element => (
+const SettingRow = ({ title, description, children }: SettingRowProps) => (
     <div className="setting-row">
         <div className="setting-row__info">
             <h4>{title}</h4>
@@ -73,7 +73,7 @@ interface SliderCardProps {
 const SliderCard = ({
     title, value, min, max, step,
     lowLabel, highLabel, description, formatValue, onChange
-}: SliderCardProps): JSX.Element => {
+}: SliderCardProps) => {
     const displayValue = formatValue ? formatValue(value) : String(value);
 
     return (
@@ -121,7 +121,7 @@ const TAB_OPTIONS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 
 // --- Section Components ---
 
-const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => (
     <div className="settings-section">
         <SectionHeader
             title="Profile Overview"
@@ -177,7 +177,7 @@ const FiltersSection = ({
     selectAllLandmarks,
     deselectAllLandmarks,
     handleApplyLocal
-}: FiltersSectionProps): JSX.Element => (
+}: FiltersSectionProps) => (
     <div className="settings-section">
         <SectionHeader
             title="Filter Configuration"
@@ -252,7 +252,7 @@ const FiltersSection = ({
     </div>
 );
 
-const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element | null => {
+const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => {
     if (settings.filterType !== 'OneEuro') return null;
 
     return (
@@ -306,7 +306,7 @@ const OneEuroSliderSection = ({ settings, onChange }: { settings: AppSettings, o
     );
 };
 
-const MovementsSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+const MovementsSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }) => (
     <div className="settings-section">
         <SectionHeader
             title="Underarm Throw"
@@ -352,7 +352,7 @@ const DataManagementSection = ({
     onExport: () => void;
     onImportClick: () => void;
     onReset: () => void;
-}): JSX.Element => (
+}) => (
     <div className="settings-section">
         <div className="settings-data-layout">
             <div className="settings-data-left">
@@ -390,7 +390,7 @@ const DataManagementSection = ({
 
 // --- Main Page Component ---
 
-export const SettingsPage = (): JSX.Element => {
+export const SettingsPage = () => {
     const [settings, setSettings] = useState<AppSettings | null>(null);
     const [originalSettings, setOriginalSettings] = useState<AppSettings | null>(null);
     const [selectedLandmarks, setSelectedLandmarks] = useState<Set<string>>(new Set());

@@ -18,7 +18,7 @@ import './style.css';
 /**
  * Handles file selection, IndexedDB storage, and video preview rendering.
  */
-const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }): JSX.Element => {
+const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,7 +96,7 @@ const VideoUploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }): JS
     );
 };
 
-export const LearnPage = (): JSX.Element => {
+export const LearnPage = () => {
     const { movementId } = useParams<{ movementId: MovementId }>();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'demo' | 'upload'>('demo');

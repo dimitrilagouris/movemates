@@ -1,6 +1,6 @@
 import './style.css';
 
-export const PrivacyPage = (): JSX.Element => {
+export const PrivacyPage = () => {
     return (
         <div className="privacy-layout">
             <div className="privacy-container">
