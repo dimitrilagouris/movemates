@@ -15,6 +15,7 @@ import { ScrubberBar } from '../../components/common/ScrubberBar';
 import { LocalGridPanel } from './LocalGridPanel';
 import { TextInput } from '../../components/common/TextInput';
 import { SelectInput } from '../../components/common/SelectInput';
+import { Toast } from '../../components/common/Toast';
 import './style.css';
 
 // --- Pure UI Components ---
@@ -158,7 +159,25 @@ const GeneralSection = ({ settings, onChange }: { settings: AppSettings, onChang
     </div>
 );
 
-const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChange: (k: keyof AppSettings, v: unknown) => void }): JSX.Element => (
+interface FiltersSectionProps {
+    settings: AppSettings;
+    onChange: (key: keyof AppSettings, value: unknown) => void;
+    selectedLandmarks: Set<string>;
+    toggleLandmark: (id: string) => void;
+    selectAllLandmarks: () => void;
+    deselectAllLandmarks: () => void;
+    handleApplyLocal: () => void;
+}
+
+const FiltersSection = ({
+    settings,
+    onChange,
+    selectedLandmarks,
+    toggleLandmark,
+    selectAllLandmarks,
+    deselectAllLandmarks,
+    handleApplyLocal
+}: FiltersSectionProps): JSX.Element => (
     <div className="settings-section">
         <SectionHeader
             title="Filter Configuration"
@@ -176,6 +195,38 @@ const FiltersSection = ({ settings, onChange }: { settings: AppSettings, onChang
                 ]}
             />
         </SettingRow>
+
+        {settings.filterMethod === 'local' && (
+            <>
+                <div className="setting-row">
+                    <div className="setting-row__info">
+                        <h4>Local Filter Targeting</h4>
+                        <p>Select specific landmarks to apply filter overrides to.</p>
+                    </div>
+                    <div className="setting-row__control">
+                        <div className="settings-local-targeting__controls">
+                            <Button variant="secondary" size="small" className="shadow-1" onClick={selectAllLandmarks}>Select All</Button>
+                            <Button variant="secondary" size="small" className="shadow-1" onClick={deselectAllLandmarks}>Deselect All</Button>
+                            <span className="selection-info-text">{selectedLandmarks.size} active targets</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-local-targeting__table-section">
+                    <LocalGridPanel
+                        selected={selectedLandmarks}
+                        toggleSelection={toggleLandmark}
+                    />
+                    {selectedLandmarks.size > 0 && (
+                        <div className="settings-local-targeting__apply">
+                            <Button variant="secondary" className="shadow-1" onClick={handleApplyLocal}>
+                                <RiMagicFill /> Apply to {selectedLandmarks.size} Selected
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </>
+        )}
 
         <SettingRow title="Algorithm Type" description="The core mathematical approach used to eliminate coordinate jitter.">
             <SelectInput
@@ -364,6 +415,7 @@ export const SettingsPage = (): JSX.Element => {
     const [originalSettings, setOriginalSettings] = useState<AppSettings | null>(null);
     const [selectedLandmarks, setSelectedLandmarks] = useState<Set<string>>(new Set());
     const [activeTab, setActiveTab] = useState<SettingsTab>('General');
+    const [showUnsavedToast, setShowUnsavedToast] = useState<boolean>(false);
 
     const dbRef = useRef(new DatabaseEngine());
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -377,6 +429,17 @@ export const SettingsPage = (): JSX.Element => {
     useEffect(() => {
         initialiseSettings();
     }, []);
+
+    useEffect(() => {
+        if (settings && originalSettings) {
+            const hasChanges = JSON.stringify(settings) !== JSON.stringify(originalSettings);
+            if (hasChanges) {
+                setShowUnsavedToast(true);
+            } else {
+                setShowUnsavedToast(false);
+            }
+        }
+    }, [settings, originalSettings]);
 
     const updateSetting = (key: keyof AppSettings, value: unknown): void => {
         if (settings) setSettings({ ...settings, [key]: value });
@@ -494,14 +557,33 @@ export const SettingsPage = (): JSX.Element => {
                 </header>
 
                 <main>
-                    {hasUnsavedChanges && (
-                        <div className="settings-banner">
-                            <div className="settings-banner__icon"><RiErrorWarningFill size={24} /></div>
-                            <div className="settings-banner__content">
-                                <h3>Unsaved Changes</h3>
-                                <p>You have modified your configuration. Remember to save.</p>
-                            </div>
-                        </div>
+                    {showUnsavedToast && (
+                        <Toast
+                            title="Unsaved Changes"
+                            message="You have modified your configuration. Remember to save."
+                            icon={<RiErrorWarningFill size={24} style={{ color: 'var(--colour-amber-400)' }} />}
+                            action={
+                                <>
+                                    <button 
+                                        onClick={() => setShowUnsavedToast(false)} 
+                                        style={{ background: 'none', border: 'none', color: 'var(--colour-slate-400)', fontWeight: 500, padding: 0, cursor: 'pointer', fontSize: 'var(--text-sm)' }}
+                                    >
+                                        Dismiss
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            handleSave();
+                                            setShowUnsavedToast(false);
+                                        }} 
+                                        style={{ background: 'none', border: 'none', color: 'var(--colour-white)', fontWeight: 600, padding: 0, cursor: 'pointer', fontSize: 'var(--text-sm)' }}
+                                    >
+                                        Save changes
+                                    </button>
+                                </>
+                            }
+                            duration={5000}
+                            onClose={() => setShowUnsavedToast(false)}
+                        />
                     )}
 
                     {activeTab === 'General' && (
@@ -510,25 +592,16 @@ export const SettingsPage = (): JSX.Element => {
 
                     {activeTab === 'Filters' && (
                         <>
-                            <FiltersSection settings={settings} onChange={updateSetting} />
+                            <FiltersSection
+                                settings={settings}
+                                onChange={updateSetting}
+                                selectedLandmarks={selectedLandmarks}
+                                toggleLandmark={toggleLandmark}
+                                selectAllLandmarks={selectAllLandmarks}
+                                deselectAllLandmarks={() => setSelectedLandmarks(new Set())}
+                                handleApplyLocal={handleApplyLocal}
+                            />
                             <OneEuroSliderSection settings={settings} onChange={updateSetting} />
-                            {settings.filterMethod === 'local' && (
-                                <div className="settings-section">
-                                    <LocalGridPanel
-                                        selected={selectedLandmarks}
-                                        toggleSelection={toggleLandmark}
-                                        selectAll={selectAllLandmarks}
-                                        deselectAll={() => setSelectedLandmarks(new Set())}
-                                    />
-                                    {selectedLandmarks.size > 0 && (
-                                        <div style={{ marginTop: 'var(--space-4)' }}>
-                                            <Button variant="secondary" className="shadow-1" onClick={handleApplyLocal}>
-                                                <RiMagicFill /> Apply to {selectedLandmarks.size} Selected
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </>
                     )}
 

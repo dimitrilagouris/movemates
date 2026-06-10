@@ -40,7 +40,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     cursor: pointer;
     font-size: var(--text-sm);
     font-weight: var(--font-weight-medium);
@@ -49,13 +49,13 @@
 }
 
 .learn-back-btn:hover {
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
 }
 
 .learn-title {
     font-size: var(--text-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     letter-spacing: -0.02em;
     margin: 0;
 }
@@ -63,7 +63,7 @@
 
 .video-container {
     flex: 1;
-    background-color: var(--colour-zinc-900);
+    background-color: var(--colour-slate-900);
     border-radius: var(--radius-xl);
     position: relative;
     overflow: hidden;
@@ -131,7 +131,7 @@
 .sidebar-card__title {
     font-size: var(--text-lg);
     font-weight: var(--font-weight-bold);
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     letter-spacing: -0.01em;
 }
 
@@ -145,7 +145,7 @@
     display: flex;
     flex-direction: column;
     padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--colour-zinc-100);
+    border-bottom: 1px solid var(--colour-slate-100);
 }
 
 .sidebar-row:last-child {
@@ -177,13 +177,13 @@
 .row-label {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-weight: var(--font-weight-medium);
 }
 
 .row-content {
     font-size: var(--text-sm);
     font-weight: var(--font-weight-medium);
-    color: var(--colour-zinc-700);
+    color: var(--colour-slate-700);
     line-height: 1.5;
 }

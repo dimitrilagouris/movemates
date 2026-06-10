@@ -115,11 +115,11 @@
 
 .sidebar-item--active {
     background-color: var(--colour-white);
-    color: var(--colour-grey-900);
+    color: var(--colour-slate-900);
 }
 
 .sidebar-item:hover {
-    color: var(--colour-grey-900);
+    color: var(--colour-slate-900);
 }
 
 .sidebar-item__icon {
@@ -177,8 +177,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--colour-zinc-200);
-    color: var(--colour-zinc-700);
+    background-color: var(--colour-slate-200);
+    color: var(--colour-slate-700);
     font-weight: 600;
     font-size: var(--text-sm);
 }

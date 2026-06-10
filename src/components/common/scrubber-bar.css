@@ -15,8 +15,8 @@
     border-radius: var(--radius-full);
     background: repeating-linear-gradient(
             to right,
-            var(--colour-zinc-300) 0px,
-            var(--colour-zinc-300) 2px,
+            var(--colour-slate-300) 0px,
+            var(--colour-slate-300) 2px,
             transparent 2px,
             transparent 6px
     );

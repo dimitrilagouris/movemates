@@ -3,12 +3,12 @@
     height: 100%;
     max-height: calc(100vh - 220px);
     object-fit: contain; /* Prevents video distortion or cropping */
-    background-color: var(--colour-zinc-950);
+    background-color: var(--colour-slate-950);
 }
 
 .replay-status {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-400);
+    color: var(--colour-slate-400);
     font-family: var(--font-mono);
     text-align: center;
 }

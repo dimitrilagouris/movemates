@@ -33,7 +33,7 @@
 
 .report-card {
     background-color: var(--colour-white);
-    border: 1px solid var(--colour-zinc-200);
+    border: 1px solid var(--colour-slate-200);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     display: flex;
@@ -48,13 +48,13 @@
 
 .report-card__title {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-weight: 500;
 }
 
 .report-card__value {
     font-size: var(--text-2xl);
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     font-weight: 700;
     font-family: var(--font-sans);
 }
@@ -69,7 +69,7 @@
 
 .report-card__detail {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     line-height: 1.4;
     margin-top: auto;
 }
@@ -87,7 +87,7 @@
     justify-content: center;
     height: 100%;
     font-size: var(--text-lg);
-    color: var(--colour-zinc-400);
+    color: var(--colour-slate-400);
     gap: var(--space-4);
 }
 
@@ -96,18 +96,18 @@
     background-color: color-mix(in srgb, var(--colour-white) 95%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--colour-zinc-200);
+    border: 1px solid var(--colour-slate-200);
     border-radius: var(--radius-md);
     padding: var(--space-4);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .custom-tooltip-label {
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-size: var(--text-xs);
     font-family: var(--font-mono);
     margin-bottom: var(--space-2);
-    border-bottom: 1px solid var(--colour-zinc-100);
+    border-bottom: 1px solid var(--colour-slate-100);
     padding-bottom: var(--space-2);
 }
 
@@ -121,7 +121,7 @@
 .stat-card {
     padding: var(--space-1);
     gap: var(--space-0);
-    background-color: var(--colour-zinc-100);
+    background-color: var(--colour-slate-100);
 }
 
 .stat-card__main {
@@ -143,19 +143,19 @@
     width: 28px;
     height: 28px;
     border-radius: var(--radius-md);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-size: var(--text-base);
 }
 
 .stat-card__title {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-weight: 500;
 }
 
 .stat-card__value {
     font-size: var(--text-2xl);
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     font-weight: 600;
     font-family: var(--font-sans);
     line-height: 1.2;
@@ -180,11 +180,11 @@
 
 .stat-card__status.success { color: var(--colour-lime-600); }
 .stat-card__status.error { color: var(--colour-red-500); }
-.stat-card__status.neutral { color: var(--colour-zinc-500); }
+.stat-card__status.neutral { color: var(--colour-slate-500); }
 
 .stat-card__detail {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
 }
 
 /* Recharts Cloning Styling */
@@ -205,7 +205,7 @@
 .chart-stat-divider {
     width: 1px;
     height: 40px;
-    background-color: var(--colour-zinc-200);
+    background-color: var(--colour-slate-200);
 }
 
 .chart-stat-val {
@@ -234,7 +234,7 @@
 
 .chart-stat-desc {
     font-size: var(--text-sm);
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
 }
 
 .chart-stat-val--left {
@@ -263,7 +263,7 @@
 
 /* Report Disclaimer Additions */
 .report-disclaimer {
-    background-color: color-mix(in srgb, var(--colour-zinc-500) 10%, transparent);
+    background-color: color-mix(in srgb, var(--colour-slate-500) 10%, transparent);
     border-radius: var(--radius-md);
     padding: var(--space-4);
     margin-bottom: var(--space-6);
@@ -273,7 +273,7 @@
 }
 
 .report-disclaimer__icon {
-    color: var(--colour-zinc-600);
+    color: var(--colour-slate-600);
     flex-shrink: 0;
     margin-top: 2px;
 }
@@ -281,21 +281,21 @@
 .report-disclaimer__text {
     margin: 0;
     font-size: var(--text-sm);
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     line-height: 1.5;
 }
 
 /* Generic title fixes */
 .report-card__title--peak {
     font-size: 1.1rem;
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 /* Recharts Legend Formatter Text */
 .recharts-legend-item-text {
-    color: var(--colour-zinc-500);
+    color: var(--colour-slate-500);
     font-size: var(--text-sm);
     margin-left: 4px;
 }
