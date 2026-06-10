@@ -6,14 +6,15 @@ import {
     RiRunLine,
     RiHeartPulseLine,
     RiQuestionLine,
-    RiSettings3Line
+    RiSettings3Line,
+    RiShieldKeyholeLine
 } from "react-icons/ri";
 
 import './style.css';
 import { SidebarItem } from './SidebarItem';
 import { UserProfile } from './UserProfile';
 
-export const Sidebar = (): JSX.Element => {
+export const Sidebar = () => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const location = useLocation();
     const navigate = useNavigate();
@@ -60,6 +61,13 @@ export const Sidebar = (): JSX.Element => {
             </nav>
 
             <div className="sidebar__footer-nav">
+                <SidebarItem
+                    label="Privacy"
+                    icon={<RiShieldKeyholeLine size={20} />}
+                    isActive={isRouteActive('/privacy')}
+                    onClick={() => navigate('/privacy')}
+                />
+                
                 <SidebarItem
                     label="Settings"
                     icon={<RiSettings3Line size={20} />}

@@ -6,6 +6,7 @@ import { Button } from '../../components/common/Button';
 import { ProfileSidebar } from './ProfileSidebar';
 import { useNavigate } from 'react-router-dom';
 import { RiUploadCloud2Line, RiArrowLeftLine } from 'react-icons/ri';
+import { UploadEmptyState } from '../../components/common/UploadEmptyState';
 import './style.css';
 
 export const ProgressPage: React.FC = () => {
@@ -61,16 +62,11 @@ export const ProgressPage: React.FC = () => {
                     </div>
 
                     {/* Import Report Empty State */}
-                    <div className="import-report-empty-state">
-                        <div className="empty-state-content">
-                            <div className="empty-state-icon">
-                                <RiUploadCloud2Line size={48} />
-                            </div>
-                            <h3>Import a Report</h3>
-                            <p>You haven't imported any external reports yet. Import a report to track your full history.</p>
-                            <Button variant="primary" className="shadow-1">Import Report</Button>
-                        </div>
-                    </div>
+                    <UploadEmptyState
+                        title="Import a Report"
+                        description="You haven't imported any external reports yet. Import a report to track your full history."
+                        buttonText="Import Report"
+                    />
                 </main>
 
                 <ProfileSidebar settings={settings} />

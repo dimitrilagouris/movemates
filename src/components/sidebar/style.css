@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: var(--colour-slate-50);
+    background-color: var(--colour-grey-50);
     width: var(--sidebar-width);
     transition: width var(--transition-normal);
     flex-shrink: 0;
@@ -50,7 +50,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--colour-slate-500);
+    color: var(--colour-grey-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,7 +64,7 @@
 }
 
 .sidebar__toggle:hover {
-    background-color: var(--colour-slate-200);
+    background-color: var(--colour-grey-200);
 }
 
 .sidebar--collapsed .sidebar__logo-container {
@@ -89,7 +89,7 @@
     flex-direction: column;
     gap: var(--space-1);
     margin-top: auto;
-    border-top: 1px solid var(--colour-slate-200);
+    border-top: 1px solid var(--colour-grey-200);
     padding-top: var(--space-4);
     flex-shrink: 0;
 }
@@ -101,7 +101,7 @@
     width: 100%;
 
     border-radius: var(--radius-lg);
-    color: var(--colour-slate-500);
+    color: var(--colour-grey-500);
     text-decoration: none;
     cursor: pointer;
     transition: var(--transition-normal);
@@ -157,7 +157,7 @@
 }
 
 .user-profile:hover {
-    background-color: var(--colour-slate-100);
+    background-color: var(--colour-grey-100);
 }
 
 .user-profile__avatar-container {
@@ -177,8 +177,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--colour-zinc-200);
-    color: var(--colour-zinc-700);
+    background-color: var(--colour-grey-200);
+    color: var(--colour-grey-700);
     font-weight: 600;
     font-size: var(--text-sm);
 }
@@ -199,6 +199,6 @@
 
 .user-profile__name {
     font-weight: 500;
-    color: var(--colour-slate-900);
+    color: var(--colour-grey-900);
     font-size: var(--text-sm);
 }

@@ -4,7 +4,7 @@
 
 .nav-tabs {
     display: flex;
-    background-color: var(--colour-slate-100);
+    background-color: var(--colour-grey-100);
     padding: var(--space-1);
     border-radius: var(--radius-md);
     height: var(--btn-height);
@@ -32,10 +32,12 @@
 
 
 .nav-tab {
+    flex: 1;
+    justify-content: center;
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     background: transparent;
-    color: var(--colour-slate-600);
+    color: var(--colour-grey-600);
     font-weight: 500;
     cursor: pointer;
     font-family: inherit;
@@ -44,9 +46,10 @@
     height: 100%;
     display: flex;
     align-items: center;
-    padding: var(--space-0) var(--space-3);
+    padding: var(--space-0) var(--space-5);
     position: relative;
     z-index: 1;
+    white-space: nowrap;
 }
 
 .nav-tab:hover {
@@ -55,7 +58,7 @@
 
 .nav-tab.active {
     background-color: transparent;
-    color: var(--colour-slate-900);
+    color: var(--colour-grey-900);
     border: 1px solid transparent;
 }
 
@@ -101,10 +104,10 @@
 
 .btn-secondary {
     background-color: var(--colour-white);
-    color: var(--colour-slate-900);
+    color: var(--colour-grey-900);
 }
 .btn-secondary:hover {
-    background-color: var(--colour-slate-50);
+    background-color: var(--colour-grey-50);
 }
 
 .btn-square {

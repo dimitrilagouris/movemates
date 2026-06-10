@@ -14,14 +14,14 @@
 .movements-hero__title {
     font-size: var(--text-3xl);
     font-weight: 600;
-    color: var(--colour-zinc-900);
+    color: var(--colour-slate-900);
     letter-spacing: -0.02em;
 }
 
 .movements-hero__subtitle {
     font-size: var(--text-3xl);
     font-weight: 600;
-    color: var(--colour-zinc-400);
+    color: var(--colour-grey-400);
     letter-spacing: -0.02em;
 }
 
@@ -35,7 +35,7 @@
 .movements-disclaimer {
     margin-top: var(--space-12);
     text-align: center;
-    color: var(--colour-zinc-500);
+    color: var(--colour-grey-500);
     font-size: var(--text-sm);
     padding: 0 var(--space-4);
 }

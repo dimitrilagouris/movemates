@@ -14,7 +14,7 @@ export interface ToggleTabsProps {
 /**
  * A segmented control toggle with an animated active indicator.
  */
-export const ToggleTabs = ({ options, activeId, onChange }: ToggleTabsProps): JSX.Element => {
+export const ToggleTabs = ({ options, activeId, onChange }: ToggleTabsProps) => {
     const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 

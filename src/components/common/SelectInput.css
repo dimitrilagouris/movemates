@@ -1,7 +1,7 @@
 .select-input-wrapper {
     display: flex;
     align-items: center;
-    border: 1px solid var(--colour-zinc-300);
+    border: 1px solid var(--colour-grey-300);
     border-radius: var(--radius-md);
     background-color: var(--colour-white);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -10,8 +10,8 @@
 
 .select-input-wrapper:focus-within,
 .select-input-wrapper--focused {
-    border-color: var(--colour-zinc-900);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-zinc-900) 10%, transparent);
+    border-color: var(--colour-grey-900);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-grey-900) 10%, transparent);
 }
 
 .select-input-icon {
@@ -19,7 +19,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--space-2) 0 var(--space-2) var(--space-3);
-    color: var(--colour-zinc-500);
+    color: var(--colour-grey-500);
 }
 
 .select-input-field {
@@ -30,7 +30,7 @@
     background: transparent;
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-sm);
-    color: var(--colour-zinc-900);
+    color: var(--colour-grey-900);
     font-family: inherit;
     appearance: none;
     /* Custom SVG chevron for the dropdown arrow */

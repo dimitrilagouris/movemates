@@ -15,8 +15,8 @@
     border-radius: var(--radius-full);
     background: repeating-linear-gradient(
             to right,
-            var(--colour-zinc-300) 0px,
-            var(--colour-zinc-300) 2px,
+            var(--colour-slate-300) 0px,
+            var(--colour-slate-300) 2px,
             transparent 2px,
             transparent 6px
     );
@@ -66,20 +66,4 @@
 /* Provide a focus state for keyboard navigation */
 .scrubber-input:focus-visible ~ .scrubber-thumb {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-slate-800) 30%, transparent);
-}
-
-.swing-slider-container {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    width: 280px;
-    margin-top: var(--space-2);
-}
-
-.swing-slider__value {
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-    width: 42px; /* NEW: Hard-locked width */
-    text-align: right; /* NEW: Keeps the text anchored cleanly */
-    flex-shrink: 0; /* NEW: Prevents flexbox from crushing it */
 }

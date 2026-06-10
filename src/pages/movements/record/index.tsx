@@ -222,7 +222,7 @@ const RecordingInterface = ({
     onStop: () => void,
     videoRef: RefObject<HTMLVideoElement>,
     canvasRef: RefObject<HTMLCanvasElement>
-}): JSX.Element => {
+}) => {
     return (
         <div className="record-video-section">
             <div className="video-container">
@@ -257,7 +257,7 @@ const RecordingInterface = ({
     );
 };
 
-const CalibrationCard = ({ progress, message }: { progress: number, message: string }): JSX.Element => (
+const CalibrationCard = ({ progress, message }: { progress: number, message: string }) => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
             <span className="sidebar-card__title">Calibration</span>
@@ -274,7 +274,7 @@ const CalibrationCard = ({ progress, message }: { progress: number, message: str
     </div>
 );
 
-const InstructionsCard = ({ instructions }: { instructions: string[] }): JSX.Element => (
+const InstructionsCard = ({ instructions }: { instructions: string[] }) => (
     <div className="sidebar-card shadow-1">
         <div className="sidebar-card__header">
             <span className="sidebar-card__title">Instructions</span>
