@@ -1,28 +1,35 @@
 import { Button } from '../../components/common/Button';
 import { LANDMARK_NAMES } from '../../types/landmarks';
 
+interface LocalGridPanelProps {
+    selected: Set<string>;
+    toggleSelection: (id: string) => void;
+    selectAll: () => void;
+    deselectAll: () => void;
+}
+
 export const LocalGridPanel = ({
     selected,
     toggleSelection,
     selectAll,
     deselectAll
-}: {
-    selected: Set<string>,
-    toggleSelection: (id: string) => void,
-    selectAll: () => void,
-    deselectAll: () => void
-}) => {
-    const handleRowSelect = (landmark: string) => {
+}: LocalGridPanelProps): JSX.Element => {
+    const handleRowSelect = (landmark: string): void => {
         ['x', 'y', 'z'].forEach(axis => toggleSelection(`${landmark}_${axis}`));
     };
 
     return (
-        <div className="settings-section">
-            <h3 className="settings-section__title">Local Filter Targeting</h3>
+        <div>
+            <div className="settings-section__header">
+                <div className="settings-section__header-text">
+                    <h3>Local Filter Targeting</h3>
+                    <p>Select specific landmarks to apply filter overrides to.</p>
+                </div>
+            </div>
 
             <div className="grid-controls">
-                <Button variant="secondary" size="small" onClick={selectAll}>Select All</Button>
-                <Button variant="secondary" size="small" onClick={deselectAll}>Deselect All</Button>
+                <Button variant="secondary" size="small" className="shadow-1" onClick={selectAll}>Select All</Button>
+                <Button variant="secondary" size="small" className="shadow-1" onClick={deselectAll}>Deselect All</Button>
                 <span className="selection-info-text">{selected.size} active targets</span>
             </div>
 
@@ -34,7 +41,7 @@ export const LocalGridPanel = ({
                     <div className="col-axis">Z</div>
                     <div className="col-actions">Actions</div>
                 </div>
-                
+
                 <div className="landmark-table-body shadow-1">
                     {LANDMARK_NAMES.map(name => (
                         <div className="landmark-table-row" key={name}>
