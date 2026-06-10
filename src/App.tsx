@@ -7,6 +7,7 @@ import { ReplayPage } from "./pages/movements/replay";
 import { ReportPage } from "./pages/movements/report";
 import { SettingsPage } from "./pages/settings";
 import { ProgressPage } from "./pages/progress";
+import { PrivacyPage } from "./pages/privacy";
 
 import './styles/base.css';
 import './styles/buttons.css';
@@ -31,6 +32,8 @@ function App(): JSX.Element {
 
                     {/* NEW: Settings view registration */}
                     <Route path="/settings" element={<SettingsPage />} />
+                    
+                    <Route path="/privacy" element={<PrivacyPage />} />
                 </Routes>
             </main>
         </div>
